@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using FluentNHibernate.Infrastructure;
 
 namespace FluentNHibernate.Utils.Reflection
@@ -125,6 +127,25 @@ namespace FluentNHibernate.Utils.Reflection
 
             list.Reverse();
             return new PropertyChain(list.ToArray());
+        }
+
+        public static Assembly FindTheCallingAssembly()
+        {
+            var trace = new StackTrace(Thread.CurrentThread, false);
+
+            var thisAssembly = Assembly.GetExecutingAssembly();
+            Assembly callingAssembly = null;
+            for (var i = 0; i < trace.FrameCount; i++)
+            {
+                var frame = trace.GetFrame(i);
+                var assembly = frame.GetMethod().DeclaringType.Assembly;
+                if (assembly != thisAssembly)
+                {
+                    callingAssembly = assembly;
+                    break;
+                }
+            }
+            return callingAssembly;
         }
     }
 }

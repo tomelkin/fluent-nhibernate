@@ -31,12 +31,15 @@ namespace FluentNHibernate.Automapping
                 .ToArray();
         }
 
-        public ITopMapping Map(AutomappingTarget target)
+        ITopMapping Map(AutomappingTarget target)
         {
             var instructions = target.Instructions;
             var config = instructions.Configuration;
-            var mapping = target.Mapping;
+            var mapping = (ClassMapping)target.Mapping; // TODO: Find a way around this cast
             var steps = config.GetMappingSteps(this, conventions);
+
+            // TODO: Change this to use defaults or something
+            mapping.Name = target.Type.AssemblyQualifiedName;
 
             mapping.Type.GetInstanceMembers()
                 .Where(config.ShouldMap)

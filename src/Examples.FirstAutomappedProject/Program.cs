@@ -2,42 +2,12 @@
 using System.IO;
 using Examples.FirstAutomappedProject.Entities;
 using FluentNHibernate;
-using FluentNHibernate.Automapping;
-using FluentNHibernate.Cfg;
-using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
 
 namespace Examples.FirstAutomappedProject
 {
-    public class ExamplePersistenceModel : PersistenceModel
-    {
-        public ExamplePersistenceModel()
-        {
-            AutoMap.ThisAssembly()
-                .UsingConfiguration<ExampleAutomappingConfiguration>();
-
-            Database(SQLiteConfiguration.Standard.UsingFile(DbFile));
-            PostConfigure(BuildSchema);
-        }
-
-        void BuildSchema(Configuration cfg)
-        {
-            // delete the existing db on each run
-            if (File.Exists(DbFile))
-                File.Delete(DbFile);
-
-            // this NHibernate tool takes a configuration (with mapping info in)
-            // and exports a database schema from it
-            new SchemaExport(cfg)
-                .Create(false, true);
-        }
-
-        const string DbFile = "firstProgram.db";
-    }
-
-
     /// <summary>
     /// Example automapped project.
     /// 
@@ -115,16 +85,6 @@ namespace Examples.FirstAutomappedProject
             Console.ReadKey();
         }
 
-        static AutoPersistenceModel CreateAutomappings()
-        {
-            // This is the actual automapping - use AutoMap to start automapping,
-            // then pick one of the static methods to specify what to map (in this case
-            // all the classes in the assembly that contains Employee), and then either
-            // use the Setup and Where methods to restrict that behaviour, or (preferably)
-            // supply a configuration instance of your definition to control the automapper.
-            return AutoMap.AssemblyOf<Employee>(new ExampleAutomappingConfiguration());
-        }
-
         /// <summary>
         /// Configure NHibernate. This method returns an ISessionFactory instance that is
         /// populated with mappings created by Fluent NHibernate.
@@ -139,12 +99,8 @@ namespace Examples.FirstAutomappedProject
         /// <returns></returns>
         private static ISessionFactory CreateSessionFactory()
         {
-            return Fluently.Configure()
-                .Database(SQLiteConfiguration.Standard
-                    .UsingFile(DbFile))
-                .Mappings(m =>
-                    m.AutoMappings.Add(CreateAutomappings))
-                .ExposeConfiguration(BuildSchema)
+            return new Configuration()
+                .ConfigureWith<ExamplePersistenceModel>()
                 .BuildSessionFactory();
         }
 

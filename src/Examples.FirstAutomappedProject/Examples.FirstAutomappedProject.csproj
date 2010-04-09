@@ -74,6 +74,7 @@
     <Compile Include="Entities\Product.cs" />
     <Compile Include="Entities\Store.cs" />
     <Compile Include="ExampleAutomappingConfiguration.cs" />
+    <Compile Include="ExamplePersistenceModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

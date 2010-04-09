@@ -9,6 +9,7 @@ using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.Utils;
+using FluentNHibernate.Utils.Reflection;
 using NHibernate.Cfg;
 
 namespace FluentNHibernate
@@ -81,7 +82,7 @@ namespace FluentNHibernate
 
         protected void AddMappingsFromThisAssembly()
         {
-            var assembly = FindTheCallingAssembly();
+            var assembly = ReflectionHelper.FindTheCallingAssembly();
             AddMappingsFromAssembly(assembly);
         }
 
@@ -103,25 +104,6 @@ namespace FluentNHibernate
         public void AddMappings(params IProvider[] providers)
         {
             instances.AddRange(providers);
-        }
-
-        private static Assembly FindTheCallingAssembly()
-        {
-            var trace = new StackTrace(Thread.CurrentThread, false);
-
-            var thisAssembly = Assembly.GetExecutingAssembly();
-            Assembly callingAssembly = null;
-            for (var i = 0; i < trace.FrameCount; i++)
-            {
-                var frame = trace.GetFrame(i);
-                var assembly = frame.GetMethod().DeclaringType.Assembly;
-                if (assembly != thisAssembly)
-                {
-                    callingAssembly = assembly;
-                    break;
-                }
-            }
-            return callingAssembly;
         }
 
         IEnumerable<IMappingAction> GetActions()
