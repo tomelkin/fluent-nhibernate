@@ -111,8 +111,8 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
             model.AddMappingsFromAssembly(typeof(TablePerSubclass.TPS_Parent).Assembly);
 
             var classMapping = model.BuildMappings()
-                .First(x => x.Classes.FirstOrDefault(c => c.Type == typeof(TablePerSubclass.TPS_Parent)) != null)
-                .Classes.First();
+                .SelectMany(x => x.Classes)
+                .First(x => x.Type == typeof(TablePerSubclass.TPS_Parent));
 
             classMapping.Subclasses.Count().ShouldBeGreaterThan(0);
         }

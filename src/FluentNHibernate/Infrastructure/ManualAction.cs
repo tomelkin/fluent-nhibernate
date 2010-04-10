@@ -15,5 +15,10 @@ namespace FluentNHibernate.Infrastructure
         {
             return mapping;
         }
+
+        public override string ToString()
+        {
+            return "{ ManualAction: " + mapping.GetType().Name + "<" + mapping.Type.Name + "> }";
+        }
     }
 }

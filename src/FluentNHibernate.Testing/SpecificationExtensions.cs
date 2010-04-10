@@ -6,6 +6,7 @@ using System.Xml;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
+using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils;
@@ -357,6 +358,19 @@ namespace FluentNHibernate.Testing
                 .SelectMany(x => x.Classes)
                 .First();
         }
+
+        public static SubclassMapping GetSubclassMapping<T>(this SubclassMap<T> provider, IProvider parent)
+        {
+            var instructions = new PersistenceInstructions();
+
+            instructions.AddActions(provider, parent);
+
+            return instructions.BuildMappings()
+                .SelectMany(x => x.Classes)
+                .SelectMany(x => x.Subclasses)
+                .First(x => x.Type == typeof(T));
+        }
+
     }
 
     public class StubProviderSource : IProviderSource

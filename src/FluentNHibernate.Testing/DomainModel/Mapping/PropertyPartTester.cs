@@ -490,9 +490,16 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         #endregion
     }
 
-    public class PropertyTarget
+    public class EntityParent
     {
         public int Id { get; set; }
+    }
+
+    public class PropertyTargetParent : EntityParent
+    {}
+
+    public class PropertyTarget : PropertyTargetParent
+    {
         public string Name { get; set; }
         public PropertyReferenceTarget Reference { get; set; }
         public IList<PropertyReferenceTarget> References { get; set; }

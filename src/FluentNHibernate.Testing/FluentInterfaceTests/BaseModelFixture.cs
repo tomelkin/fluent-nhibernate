@@ -21,7 +21,16 @@ namespace FluentNHibernate.Testing.FluentInterfaceTests
         protected ModelTester<ClassMap<T>, ClassMapping> ClassMap<T>()
         {
             return new ModelTester<ClassMap<T>, ClassMapping>(() => new ClassMap<T>(), x =>
-                ((IProvider)x).GetClassMapping());
+                x.GetClassMapping());
+        }
+
+        protected ModelTester<SubclassMap<T>, SubclassMapping> SubclassMap<TParent, T>()
+            where TParent : EntityParent
+        {
+            var parentProvider = new ClassMap<TParent>();
+            parentProvider.Id(x => x.Id);
+            return new ModelTester<SubclassMap<T>, SubclassMapping>(() => new SubclassMap<T>(), x =>
+                x.GetSubclassMapping(parentProvider));
         }
 
         protected ModelTester<DiscriminatorPart, DiscriminatorMapping> DiscriminatorMap<T>()
@@ -37,21 +46,9 @@ namespace FluentNHibernate.Testing.FluentInterfaceTests
             return new ModelTester<SubClassPart<T>, SubclassMapping>(() => new SubClassPart<T>(null, null), x => ((ISubclassMappingProvider)x).GetSubclassMapping());
         }
 
-        protected ModelTester<SubclassMap<T>, SubclassMapping> SubclassMapForSubclass<T>()
-        {
-            return new ModelTester<SubclassMap<T>, SubclassMapping>(() => new SubclassMap<T>(), x => (SubclassMapping)((IProvider)x).GetAction());
-        }
-
         protected ModelTester<JoinedSubClassPart<T>, SubclassMapping> JoinedSubclass<T>()
         {
             return new ModelTester<JoinedSubClassPart<T>, SubclassMapping>(() => new JoinedSubClassPart<T>("column"), x => ((ISubclassMappingProvider)x).GetSubclassMapping());
-        }
-
-        protected ModelTester<SubclassMap<T>, SubclassMapping> SubclassMapForJoinedSubclass<T>()
-        {
-            return null;
-            //return new ModelTester<SubclassMap<T>, SubclassMapping>(() => new SubclassMap<T>(), x =>
-            //    x.GetSubclassAction());
         }
 
         protected ModelTester<ComponentPart<T>, ComponentMapping> Component<T>()

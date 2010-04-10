@@ -5,7 +5,6 @@ using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
-using FluentNHibernate.Utils;
 
 namespace FluentNHibernate.Mapping
 {
@@ -13,11 +12,8 @@ namespace FluentNHibernate.Mapping
     {
         private readonly AttributeStore<SubclassMapping> attributes = new AttributeStore<SubclassMapping>();
 
-        // this is a bit weird, but we need a way of delaying the generation of the subclass mappings until we know
-        // what the parent subclass type is...
-        private readonly IDictionary<Type, IIndeterminateSubclassMappingProvider> indetermineateSubclasses = new Dictionary<Type, IIndeterminateSubclassMappingProvider>();
         private bool nextBool = true;
-        private IList<JoinMapping> joins = new List<JoinMapping>();
+        private readonly IList<JoinMapping> joins = new List<JoinMapping>();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SubclassMap<T> Not
@@ -32,8 +28,6 @@ namespace FluentNHibernate.Mapping
         IMappingAction IProvider.GetAction()
         {
             var mapping = new SubclassMapping(SubclassType.Subclass);
-
-            GenerateNestedSubclasses(mapping);
 
             attributes.SetDefault(x => x.Type, typeof(T));
             attributes.SetDefault(x => x.Name, typeof(T).AssemblyQualifiedName);
@@ -76,18 +70,6 @@ namespace FluentNHibernate.Mapping
         Type IIndeterminateSubclassMappingProvider.Extends
         {
             get { return attributes.Get(x => x.Extends); }
-        }
-
-        private void GenerateNestedSubclasses(SubclassMapping mapping)
-        {
-            foreach (var subclassType in indetermineateSubclasses.Keys)
-            {
-                var subclassMapping = (SubclassMapping)indetermineateSubclasses[subclassType].GetAction();
-
-                subclassMapping.ChangeSubclassType(mapping.SubclassType);
-
-                mapping.AddSubclass(subclassMapping);
-            }
         }
 
         private string GetDefaultTableName()
@@ -147,15 +129,6 @@ namespace FluentNHibernate.Mapping
         {
             attributes.Set(x => x.SelectBeforeUpdate, nextBool);
             nextBool = true;
-        }
-
-        public void Subclass<TSubclass>(Action<SubclassMap<TSubclass>> subclassDefinition)
-        {
-            var subclass = new SubclassMap<TSubclass>();
-
-            subclassDefinition(subclass);
-
-            indetermineateSubclasses[typeof(TSubclass)] = subclass;
         }
 
         public void DiscriminatorValue(object discriminatorValue)

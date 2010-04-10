@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.Mapping.Providers;
@@ -54,11 +55,12 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * since it does not implement the interface.
              */
             var mappings = GetMappingsFor(new FooMap(), new StandAloneMap());
-            var fooMapping = mappings.SelectMany(x => x.Classes).First(x => x.Type == typeof(IFoo));
-            
             var sut = CreateSut();
-            sut.ProcessHibernateMapping(mappings.First());
-            Assert.AreEqual(0, fooMapping.Subclasses.Count());
+            var ex = Catch.Exception(() => sut.ProcessHibernateMapping(mappings.First()));
+
+            ex.ShouldBeOfType<UnresolvedSubclassException>();
+            ex.As<UnresolvedSubclassException>()
+                .UnresolvedTypes.ShouldContain(typeof(StandAlone));
         }
 
         [Test]
@@ -69,11 +71,12 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * since it does not implement the interface.
              */
             var mappings = GetMappingsFor(new BaseMap(), new StandAloneMap());
-            var fooMapping = mappings.SelectMany(x => x.Classes).First(x => x.Type == typeof(Base));
-            
             var sut = CreateSut();
-            sut.ProcessHibernateMapping(mappings.First());
-            Assert.AreEqual(0, fooMapping.Subclasses.Count());
+            var ex = Catch.Exception(() => sut.ProcessHibernateMapping(mappings.First()));
+
+            ex.ShouldBeOfType<UnresolvedSubclassException>();
+            ex.As<UnresolvedSubclassException>()
+                .UnresolvedTypes.ShouldContain(typeof(StandAlone));
         }
 
         [Test]
@@ -129,11 +132,17 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
 
         IEnumerable<HibernateMapping> GetMappingsFor(params IProvider[] providers)
         {
-            var instructions = new PersistenceInstructions();
+            var hbm = new HibernateMapping();
 
-            instructions.AddActions(providers);
+            foreach (var action in providers.Select(x => x.GetAction()))
+            {
+                var mapping = (ITopMapping)action.GetType()
+                    .GetField("mapping", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(action);
+                mapping.AddTo(hbm);
+            }
 
-            return instructions.BuildMappings();
+            return new[] { hbm };
         }
 
         private interface IFoo
