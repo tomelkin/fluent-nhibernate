@@ -40,6 +40,18 @@ namespace FluentNHibernate.Specs
                 .First();
         }
 
+        public static SubclassMapping GetSubclassMapping<T>(this SubclassMap<T> provider, IProvider parent)
+        {
+            var instructions = new PersistenceInstructions();
+
+            instructions.AddActions(provider, parent);
+
+            return instructions.BuildMappings()
+                .SelectMany(x => x.Classes)
+                .SelectMany(x => x.Subclasses)
+                .First(x => x.Type == typeof(T));
+        }
+
         public static ClassMapping BuildMappingFor<T>(this MappingCompiler compiler)
         {
             return compiler.BuildMappings()

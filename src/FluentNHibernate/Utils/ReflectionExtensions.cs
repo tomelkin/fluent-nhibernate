@@ -10,5 +10,10 @@ namespace FluentNHibernate.Utils
         {
             return ReflectionHelper.GetMember(propertyExpression);
         }
+
+        public static Member ToMember<TMapping>(this Expression<Action<TMapping>> methodExpression)
+        {
+            return ReflectionHelper.GetMember(methodExpression);
+        }
     }
 }

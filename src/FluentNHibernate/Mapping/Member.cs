@@ -133,7 +133,7 @@ namespace FluentNHibernate
         }
     }
 
-    internal class MethodMember : Member
+    public class MethodMember : Member
     {
         private readonly MethodInfo member;
 
@@ -207,6 +207,21 @@ namespace FluentNHibernate
         public override bool IsInternal
         {
             get { return member.IsAssembly || member.IsFamilyAndAssembly; }
+        }
+
+        public bool HasParameters
+        {
+            get { return member.GetParameters().Length > 0; }
+        }
+
+        public void Invoke(object instance, params object[] parameters)
+        {
+            member.Invoke(instance, parameters);
+        }
+
+        public IEnumerable<Type> GetParameters()
+        {
+            return member.GetParameters().Select(x => x.ParameterType);
         }
     }
 

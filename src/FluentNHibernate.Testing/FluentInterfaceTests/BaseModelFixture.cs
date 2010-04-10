@@ -20,7 +20,8 @@ namespace FluentNHibernate.Testing.FluentInterfaceTests
     {
         protected ModelTester<ClassMap<T>, ClassMapping> ClassMap<T>()
         {
-            return new ModelTester<ClassMap<T>, ClassMapping>(() => new ClassMap<T>(), x => (ClassMapping)((IProvider)x).GetAction());
+            return new ModelTester<ClassMap<T>, ClassMapping>(() => new ClassMap<T>(), x =>
+                ((IProvider)x).GetClassMapping());
         }
 
         protected ModelTester<DiscriminatorPart, DiscriminatorMapping> DiscriminatorMap<T>()
@@ -48,7 +49,9 @@ namespace FluentNHibernate.Testing.FluentInterfaceTests
 
         protected ModelTester<SubclassMap<T>, SubclassMapping> SubclassMapForJoinedSubclass<T>()
         {
-            return new ModelTester<SubclassMap<T>, SubclassMapping>(() => new SubclassMap<T>(), x => (SubclassMapping)((IProvider)x).GetAction());
+            return null;
+            //return new ModelTester<SubclassMap<T>, SubclassMapping>(() => new SubclassMap<T>(), x =>
+            //    x.GetSubclassAction());
         }
 
         protected ModelTester<ComponentPart<T>, ComponentMapping> Component<T>()

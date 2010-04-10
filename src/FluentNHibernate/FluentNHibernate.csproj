@@ -747,6 +747,7 @@
     <Compile Include="Reveal.cs" />
     <Compile Include="UnknownPropertyException.cs" />
     <Compile Include="Visitors\UnresolvedComponentReferenceVisitedException.cs" />
+    <Compile Include="Visitors\UnresolvedSubclassException.cs" />
     <Compile Include="Visitors\ValidationException.cs" />
     <Compile Include="Visitors\ValidationVisitor.cs" />
   </ItemGroup>

@@ -10,6 +10,11 @@ namespace FluentNHibernate.Utils.Reflection
 {
     public static class ReflectionHelper
     {
+        public static Member GetMember<TModel>(Expression<Action<TModel>> expression)
+        {
+            return GetMember(expression.Body);
+        }
+
         public static Member GetMember<TModel, TReturn>(Expression<Func<TModel, TReturn>> expression)
         {
             return GetMember(expression.Body);

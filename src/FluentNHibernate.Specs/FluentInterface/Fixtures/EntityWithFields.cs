@@ -2,9 +2,11 @@ using System;
 
 namespace FluentNHibernate.Specs.FluentInterface.Fixtures
 {
-    class EntityWithFields
+    class EntityWithFieldsParent : EntityParent
+    {}
+
+    class EntityWithFields : EntityWithFieldsParent
     {
         public string Name;
-        public int Id;
     }
 }

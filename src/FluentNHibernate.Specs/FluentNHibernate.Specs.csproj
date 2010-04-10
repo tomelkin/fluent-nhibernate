@@ -91,6 +91,7 @@
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Version.cs" />
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Id.cs" />
     <Compile Include="FluentInterface\ComponentMapSpecs.cs" />
+    <Compile Include="FluentInterface\Fixtures\EntityParent.cs" />
     <Compile Include="FluentInterface\Fixtures\EntityWithComponent.cs" />
     <Compile Include="FluentInterface\Fixtures\EntityWithFields.cs" />
     <Compile Include="FluentInterface\Fixtures\EntityWithReferences.cs" />
@@ -99,6 +100,8 @@
     <Compile Include="FluentInterface\Fixtures\EntityWithCollections.cs" />
     <Compile Include="FluentInterface\Fixtures\EntityWithProperties.cs" />
     <Compile Include="FluentInterface\Fixtures\SuperTarget.cs" />
+    <Compile Include="FluentInterface\Model\ProviderToModelMappingTester.cs" />
+    <Compile Include="FluentInterface\Model\SubclassMapModelSpecs.cs" />
     <Compile Include="FluentInterface\ProviderSpec.cs" />
     <Compile Include="FluentInterface\SubclassMapSpecs\SubclassMapSpecs.Component.cs" />
     <Compile Include="FluentInterface\SubclassMapSpecs\SubclassMapSpecs.HasMany.cs" />

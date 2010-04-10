@@ -110,7 +110,6 @@ namespace FluentNHibernate
         {
             var actionsFromInstances = instances.Select(x => x.GetAction());
             var actionsFromProviders = GetProvidersFromSources().Select(x => x.GetAction());
-            var actionsForAutomapping = automapping.GetTypesToMap().Select(x => new PartialAutomapAction(x, new AutomappingEntitySetup()));
 
             // all pre-instantiated providers)
             foreach (var action in actionsFromInstances)
@@ -121,8 +120,13 @@ namespace FluentNHibernate
                 yield return action;
 
             // all types for mapping by the automapper
-            foreach (var action in actionsForAutomapping)
-                yield return action;
+            if (automapping != null)
+            {
+                var actionsForAutomapping = automapping.GetTypesToMap().Select(x => new PartialAutomapAction(x, new AutomappingEntitySetup()));
+                
+                foreach (var action in actionsForAutomapping)
+                    yield return action;
+            }
         }
 
         IPersistenceInstructions IPersistenceInstructionGatherer.GetInstructions()

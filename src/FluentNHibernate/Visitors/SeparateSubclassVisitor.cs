@@ -11,6 +11,7 @@ namespace FluentNHibernate.Visitors
     {
         List<ClassMapping> classes;
         List<SubclassMapping> subclasses;
+        List<SubclassMapping> processedSubclasses;
         HibernateMapping currentHibernateMapping;
 
         public override void ProcessHibernateMapping(HibernateMapping hibernateMapping)
@@ -18,9 +19,19 @@ namespace FluentNHibernate.Visitors
             currentHibernateMapping = hibernateMapping;
             classes = hibernateMapping.Classes.ToList();
             subclasses = hibernateMapping.Subclasses.ToList();
+            processedSubclasses = new List<SubclassMapping>();
 
             subclasses.Each(PairSubclass);
             classes.Each(PairClass);
+
+            if (processedSubclasses.Count < subclasses.Count)
+            {
+                var unresolvedSubclassTypes = subclasses
+                    .Except(processedSubclasses)
+                    .Select(x => x.Type);
+
+                throw UnresolvedSubclassException.New(unresolvedSubclassTypes);
+            }
         }
 
         void PairClass(ClassMapping mapping)
@@ -32,7 +43,7 @@ namespace FluentNHibernate.Visitors
                 subclass.ChangeSubclassType(CreateSubclass(mapping));
 
                 mapping.AddSubclass(subclass);
-                currentHibernateMapping.RemoveSubclass(subclass);
+                FlagAsProcessed(subclass);
             }
         }
 
@@ -45,8 +56,14 @@ namespace FluentNHibernate.Visitors
                 subclass.ChangeSubclassType(mapping.SubclassType);
 
                 mapping.AddSubclass(subclass);
-                currentHibernateMapping.RemoveSubclass(subclass);
+                FlagAsProcessed(subclass);
             }
+        }
+
+        void FlagAsProcessed(SubclassMapping mapping)
+        {
+            currentHibernateMapping.RemoveSubclass(mapping);
+            processedSubclasses.Add(mapping);
         }
 
         IEnumerable<SubclassMapping> FindClosestSubclasses(Type type)

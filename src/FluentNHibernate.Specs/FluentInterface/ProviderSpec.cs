@@ -3,6 +3,7 @@ using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel.ClassBased;
+using FluentNHibernate.Specs.FluentInterface.Fixtures;
 
 namespace FluentNHibernate.Specs.FluentInterface
 {
@@ -17,13 +18,16 @@ namespace FluentNHibernate.Specs.FluentInterface
             return provider.GetClassMapping();
         }
 
-        public static SubclassMapping map_as_subclass<T>(Action<SubclassMap<T>> setup)
+        public static SubclassMapping map_as_subclass<TParent, T>(Action<SubclassMap<T>> setup)
+            where TParent : EntityParent
         {
+            var parent = new ClassMap<TParent>();
+            parent.Id(x => x.Id);
             var provider = new SubclassMap<T>();
 
             setup(provider);
 
-            return (SubclassMapping)((IProvider)provider).GetAction();
+            return provider.GetSubclassMapping(parent);
         }
     }
 

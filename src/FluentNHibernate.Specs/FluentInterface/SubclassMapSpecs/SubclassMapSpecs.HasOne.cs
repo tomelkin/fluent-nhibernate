@@ -7,7 +7,7 @@ namespace FluentNHibernate.Specs.FluentInterface.SubclassMapSpecs
     public class when_subclass_map_is_told_to_map_a_has_one : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_subclass<EntityWithReferences>(m => m.HasOne(x => x.Reference));
+            mapping = map_as_subclass<EntityWithReferencesParent, EntityWithReferences>(m => m.HasOne(x => x.Reference));
 
         Behaves_like<ClasslikeHasOneBehaviour> a_has_one_in_a_classlike_mapping;
 
@@ -17,7 +17,7 @@ namespace FluentNHibernate.Specs.FluentInterface.SubclassMapSpecs
     public class when_subclass_map_is_told_to_map_a_has_one_using_reveal : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_subclass<EntityWithReferences>(m => m.HasOne(Reveal.Property<EntityWithReferences>("Reference")));
+            mapping = map_as_subclass<EntityWithReferencesParent, EntityWithReferences>(m => m.HasOne(Reveal.Property<EntityWithReferences>("Reference")));
 
         Behaves_like<ClasslikeHasOneBehaviour> a_has_one_in_a_classlike_mapping;
 

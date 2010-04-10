@@ -346,6 +346,17 @@ namespace FluentNHibernate.Testing
         {
             instructions.AddActions(providers.Select(x => x.GetAction()));
         }
+
+        public static ClassMapping GetClassMapping(this IProvider provider)
+        {
+            var instructions = new PersistenceInstructions();
+
+            instructions.AddActions(provider.GetAction());
+
+            return instructions.BuildMappings()
+                .SelectMany(x => x.Classes)
+                .First();
+        }
     }
 
     public class StubProviderSource : IProviderSource

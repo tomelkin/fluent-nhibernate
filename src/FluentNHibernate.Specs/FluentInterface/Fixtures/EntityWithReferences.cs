@@ -2,10 +2,12 @@ using System;
 
 namespace FluentNHibernate.Specs.FluentInterface.Fixtures
 {
-    class EntityWithReferences
+    class EntityWithReferencesParent : EntityParent
+    {}
+
+    class EntityWithReferences : EntityWithReferencesParent
     {
         public ReferenceTarget Reference { get; set; }
-        public int Id { get; set; }
     }
 
     class ReferenceTarget

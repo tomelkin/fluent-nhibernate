@@ -2,15 +2,25 @@
 
 namespace FluentNHibernate.Specs.FluentInterface.Fixtures
 {
-    class EntityWithProperties
+    class EntityWithPropertiesParent : EntityParent
+    {}
+
+    class EntityWithProperties : EntityWithPropertiesParent
     {
-        public int Id { get; set; }
         public string Name { get; set; }
     }
 
-    class EntityWithPrivateProperties
+    class EntityWithPrivatePropertiesParent : EntityParent
+    {}
+
+    class EntityWithPrivateProperties : EntityWithPrivatePropertiesParent
     {
-        private int Id { get; set; }
         private string Name { get; set; }
     }
+
+    class ProxyClass
+    {}
+
+    class PersisterClass
+    {}
 }
