@@ -42,7 +42,7 @@ namespace FluentNHibernate.Automapping
             mapping.Name = target.Type.AssemblyQualifiedName;
 
             mapping.Type.GetInstanceMembers()
-                .Where(config.ShouldMap)
+                .Where(x => config.ShouldMap(x) && !target.IsMemberUsed(x))
                 .Select(x => MapMember(target, x, steps))
                 .Where(x => x != null)
                 .Each(mapping.AddMappedMember);

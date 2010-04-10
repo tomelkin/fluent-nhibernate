@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel.ClassBased;
@@ -170,6 +169,7 @@ namespace FluentNHibernate.Automapping
             return base.Version(property);
         }
 
+#pragma warning disable 612,618
 		public AutoJoinedSubClassPart<TSubclass> JoinedSubClass<TSubclass>(string keyColumn, Action<AutoJoinedSubClassPart<TSubclass>> action)
 			where TSubclass : T
         {
@@ -199,9 +199,9 @@ namespace FluentNHibernate.Automapping
 			where TSubclass : T
 		{
 			return JoinedSubClass<TSubclass>(keyColumn, null);
-		}
+        }
 
-		public AutoSubClassPart<TSubclass> SubClass<TSubclass>(object discriminatorValue, Action<AutoSubClassPart<TSubclass>> action)
+        public AutoSubClassPart<TSubclass> SubClass<TSubclass>(object discriminatorValue, Action<AutoSubClassPart<TSubclass>> action)
 			where TSubclass : T
         {
             var genericType = typeof(AutoSubClassPart<>).MakeGenericType(typeof(TSubclass));
@@ -232,5 +232,6 @@ namespace FluentNHibernate.Automapping
 
             return (IAutoClasslike)subclass;
         }
+#pragma warning restore 612,618
     }
 }

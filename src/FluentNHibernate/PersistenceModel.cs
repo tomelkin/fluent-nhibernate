@@ -110,7 +110,7 @@ namespace FluentNHibernate
         {
             var actionsFromInstances = instances.Select(x => x.GetAction());
             var actionsFromProviders = GetProvidersFromSources().Select(x => x.GetAction());
-            var actionsForAutomapping = automapping.GetTypesToMap().Select(x => new PartialAutomapAction(x));
+            var actionsForAutomapping = automapping.GetTypesToMap().Select(x => new PartialAutomapAction(x, new AutomappingEntitySetup()));
 
             // all pre-instantiated providers)
             foreach (var action in actionsFromInstances)

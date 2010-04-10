@@ -254,10 +254,5 @@ namespace FluentNHibernate.Mapping
         {
             attributes.Set(x => x.Extends, type);
         }
-
-        public ITopMapping GetMapping()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

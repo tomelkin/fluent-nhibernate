@@ -22,7 +22,7 @@ namespace FluentNHibernate.Utils
             if (expression.Body is ConstantExpression)
                 return Convert((ConstantExpression)expression.Body);
 
-            throw new NotImplementedException();
+            throw new NotSupportedException("Cannot convert expression to SQL, too complex");
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace FluentNHibernate.Utils
             if (expression.Body is BinaryExpression)
                 return Convert<T>((BinaryExpression)expression.Body);
 
-            throw new NotImplementedException();
+            throw new NotSupportedException("Cannot convert expression to SQL, too complex");
         }
 
         private static string Convert<T>(Expression<Func<T, object>> expression, MemberExpression body)
@@ -77,7 +77,7 @@ namespace FluentNHibernate.Utils
             if (unaryExpression != null && unaryExpression.NodeType == ExpressionType.Convert)
                 return Convert(expression, unaryExpression);
 
-            throw new NotImplementedException();
+            throw new NotSupportedException("Cannot convert expression to SQL, too complex");
         }
 
         private static string Convert(ConstantExpression expression)

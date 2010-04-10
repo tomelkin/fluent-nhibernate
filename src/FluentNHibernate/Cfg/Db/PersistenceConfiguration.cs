@@ -201,7 +201,6 @@ namespace FluentNHibernate.Cfg.Db
 
         /// <summary>
         /// Sets the proxyfactory.factory_class property.
-        /// NOTE: NHibernate 2.1 only
         /// </summary>
         /// <param name="proxyFactoryFactoryClass">factory class</param>
         /// <returns>Configuration</returns>

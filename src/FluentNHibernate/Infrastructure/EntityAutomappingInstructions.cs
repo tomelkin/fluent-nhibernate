@@ -1,38 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentNHibernate.Automapping;
+using FluentNHibernate.Automapping.Steps;
+using FluentNHibernate.Conventions;
+using FluentNHibernate.Mapping;
 
 namespace FluentNHibernate.Infrastructure
 {
     // TODO: Use this class to combine the main instructions with individual
     // entity instructions. Currently just delegates everything to the main instructions
-    public class EntityAutomappingInstructions : IAutomappingInstructions
+    public class EntityAutomappingInstructions : IEntityAutomappingInstructions
     {
         readonly IAutomappingInstructions mainInstructions;
+        readonly AutomappingEntitySetup setup;
 
-        public EntityAutomappingInstructions(IAutomappingInstructions mainInstructions)
+        public EntityAutomappingInstructions(IAutomappingInstructions mainInstructions, AutomappingEntitySetup setup)
         {
             this.mainInstructions = mainInstructions;
+            this.setup = setup;
         }
 
-        public IAutomappingConfiguration Configuration
+        public IEntityAutomappingConfiguration Configuration
         {
-            get { return mainInstructions.Configuration ?? new DefaultAutomappingConfiguration(); }
+            get { return GetConfiguration(); }
         }
 
-        public void UseConfiguration(IAutomappingConfiguration cfg)
+        IEntityAutomappingConfiguration GetConfiguration()
         {
-            throw new NotImplementedException();
+            var innerCfg = setup.Configuration ?? mainInstructions.Configuration ?? new DefaultAutomappingConfiguration();
+
+            if (!setup.Exclusions.Any())
+                return innerCfg;
+
+            return new ExclusionWrappedConfiguration(innerCfg, setup.Exclusions);
         }
 
-        public void AddSource(ITypeSource source)
+        public class ExclusionWrappedConfiguration : IEntityAutomappingConfiguration
         {
-            throw new NotImplementedException();
-        }
+            readonly IAutomappingConfiguration innerCfg;
+            readonly IEnumerable<Predicate<Member>> exclusions;
 
-        public IEnumerable<Type> GetTypesToMap()
-        {
-            throw new NotImplementedException();
+            public ExclusionWrappedConfiguration(IAutomappingConfiguration innerCfg, IEnumerable<Predicate<Member>> exclusions)
+            {
+                this.innerCfg = innerCfg;
+                this.exclusions = exclusions;
+            }
+
+            public bool ShouldMap(Member member)
+            {
+                return innerCfg.ShouldMap(member) && !exclusions.Any(x => x(member));
+            }
+
+            public IEnumerable<IAutomappingStep> GetMappingSteps(IAutomapper mapper, IConventionFinder conventionFinder)
+            {
+                return innerCfg.GetMappingSteps(mapper, conventionFinder);
+            }
         }
     }
 }

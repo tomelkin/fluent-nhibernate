@@ -73,6 +73,7 @@
     <Compile Include="Automapping\Alterations\IAutoMappingAlteration.cs" />
     <Compile Include="Automapping\Alterations\IAutoMappingOverride.cs" />
     <Compile Include="Automapping\AutomapperV2.cs" />
+    <Compile Include="Automapping\Steps\StepExtensions.cs" />
     <Compile Include="Cfg\Db\IDatabaseConfiguration.cs" />
     <Compile Include="Cfg\Db\PreconfiguredDatabaseConfiguration.cs" />
     <Compile Include="IAutomappingInstructions.cs" />
@@ -557,7 +558,6 @@
     <Compile Include="Conventions\ISubclassConvention.cs" />
     <Compile Include="Conventions\MultipleAttribute.cs" />
     <Compile Include="Data\Entity.cs" />
-    <Compile Include="Infrastructure\DummyMethodInfo.cs" />
     <Compile Include="Cfg\Db\MsSqlConfiguration.cs" />
     <Compile Include="Infrastructure\DummyPropertyInfo.cs" />
     <Compile Include="Infrastructure\ResolveException.cs" />

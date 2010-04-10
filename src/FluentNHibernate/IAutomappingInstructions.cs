@@ -14,6 +14,11 @@ namespace FluentNHibernate
         IEnumerable<Type> GetTypesToMap();
     }
 
+    public interface IEntityAutomappingInstructions
+    {
+        IEntityAutomappingConfiguration Configuration { get; }
+    }
+
     public class AutomappingInstructions : IAutomappingInstructions
     {
         readonly List<ITypeSource> sources = new List<ITypeSource>();

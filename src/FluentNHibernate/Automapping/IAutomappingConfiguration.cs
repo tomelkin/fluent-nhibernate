@@ -6,26 +6,8 @@ using FluentNHibernate.Conventions;
 
 namespace FluentNHibernate.Automapping
 {
-    /// <summary>
-    /// Implement this interface to control how the automapper behaves.
-    /// </summary>
-    public interface IAutomappingConfiguration
+    public interface IEntityAutomappingConfiguration
     {
-        /// <summary>
-        /// Determines whether a type should be auto-mapped.
-        /// Override to restrict which types are mapped in your domain.
-        /// </summary>
-        /// <remarks>
-        /// You normally want to override this method and restrict via something known, like
-        /// Namespace.
-        /// </remarks>
-        /// <example>
-        /// return type.Namespace.EndsWith("Domain");
-        /// </example>
-        /// <param name="type">Type to map</param>
-        /// <returns>Should map type</returns>
-        bool ShouldMap(Type type);
-
         /// <summary>
         /// Determines whether a member of a type should be auto-mapped.
         /// Override to restrict which members are considered in automapping.
@@ -42,6 +24,34 @@ namespace FluentNHibernate.Automapping
         /// <param name="member">Member to map</param>
         /// <returns>Should map member</returns>
         bool ShouldMap(Member member);
+
+        /// <summary>
+        /// Gets the steps that are executed to map a type.
+        /// </summary>
+        /// <returns>Collection of mapping steps</returns>
+        // TODO: Remove need for ConventionFinder and AutoMapper references here
+        IEnumerable<IAutomappingStep> GetMappingSteps(IAutomapper mapper, IConventionFinder conventionFinder);
+    }
+
+    /// <summary>
+    /// Implement this interface to control how the automapper behaves.
+    /// </summary>
+    public interface IAutomappingConfiguration : IEntityAutomappingConfiguration
+    {
+        /// <summary>
+        /// Determines whether a type should be auto-mapped.
+        /// Override to restrict which types are mapped in your domain.
+        /// </summary>
+        /// <remarks>
+        /// You normally want to override this method and restrict via something known, like
+        /// Namespace.
+        /// </remarks>
+        /// <example>
+        /// return type.Namespace.EndsWith("Domain");
+        /// </example>
+        /// <param name="type">Type to map</param>
+        /// <returns>Should map type</returns>
+        bool ShouldMap(Type type);
 
         /// <summary>
         /// Determines whether a member is the id of an entity.
@@ -62,14 +72,6 @@ namespace FluentNHibernate.Automapping
         SubclassStrategy GetSubclassStrategy(Type type);
         bool AbstractClassIsLayerSupertype(Type type);
         string SimpleTypeCollectionValueColumn(Member member);
-
-        /// <summary>
-        /// Gets the steps that are executed to map a type.
-        /// </summary>
-        /// <returns>Collection of mapping steps</returns>
-        // TODO: Remove need for ConventionFinder and AutoMapper references here
-        IEnumerable<IAutomappingStep> GetMappingSteps(IAutomapper mapper, IConventionFinder conventionFinder);
-
         void GetConventions(IConventionContainer container);
     }
 }

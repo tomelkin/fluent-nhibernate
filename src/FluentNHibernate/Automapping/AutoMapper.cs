@@ -168,7 +168,7 @@ namespace FluentNHibernate.Automapping
 
         public IEnumerable<ITopMapping> Map(IEnumerable<AutomappingTarget> targets)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Obsolete");
         }
     }
 }

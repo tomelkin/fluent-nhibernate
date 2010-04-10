@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using FluentNHibernate.Automapping;
+using FluentNHibernate.Automapping.Steps;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
@@ -12,6 +14,7 @@ using NHibernate.Persister.Entity;
 
 namespace FluentNHibernate.Mapping
 {
+    // TODO: Make SubclassMap+ComponentMap expose AutoMap
     public class ClassMap<T> : ClasslikeMapBase<T>, IProvider
     {
         protected readonly AttributeStore<ClassMapping> attributes = new AttributeStore<ClassMapping>();
@@ -106,7 +109,7 @@ namespace FluentNHibernate.Mapping
             mapping.Tuplizer = tuplizerMapping;
 
             if (automapping != null)
-                return new PartialAutomapAction(mapping);
+                return new PartialAutomapAction(mapping, automapping);
 
             return new ManualAction(mapping);
         }
@@ -490,18 +493,30 @@ namespace FluentNHibernate.Mapping
             return this;
         }
 
-        public AutomappingEntityBuilder AutoMap
+        public AutomappingEntityBuilder<T> AutoMap
         {
-            get { return new AutomappingEntityBuilder(automapping ?? (automapping = new AutomappingEntitySetup()));}
+            get { return new AutomappingEntityBuilder<T>(automapping ?? (automapping = new AutomappingEntitySetup()));}
         }
     }
 
     public class AutomappingEntitySetup
     {
+        readonly List<Predicate<Member>> exclusions = new List<Predicate<Member>>();
+
         public IAutomappingConfiguration Configuration { get; set; }
+        
+        public IEnumerable<Predicate<Member>> Exclusions
+        {
+            get { return exclusions; }
+        }
+
+        public void AddExclusion(Predicate<Member> predicate)
+        {
+            exclusions.Add(predicate);
+        }
     }
 
-    public class AutomappingEntityBuilder
+    public class AutomappingEntityBuilder<T>
     {
         readonly AutomappingEntitySetup setup;
 
@@ -510,20 +525,33 @@ namespace FluentNHibernate.Mapping
             this.setup = setup;
         }
 
-        public AutomappingEntityBuilder This()
+        public AutomappingEntityBuilder<T> This()
         {
             return this;
         }
 
-        public AutomappingEntityBuilder UsingConfiguration<T>()
-            where T : IAutomappingConfiguration, new()
+        public AutomappingEntityBuilder<T> UsingConfiguration<TConfig>()
+            where TConfig : IAutomappingConfiguration, new()
         {
-            return UsingConfiguration(new T());
+            return UsingConfiguration(new TConfig());
         }
 
-        public AutomappingEntityBuilder UsingConfiguration(IAutomappingConfiguration cfg)
+        public AutomappingEntityBuilder<T> UsingConfiguration(IAutomappingConfiguration cfg)
         {
             setup.Configuration = cfg;
+            return this;
+        }
+
+        public AutomappingEntityBuilder<T> Excluding(Expression<Func<T, object>> property)
+        {
+            var member = property.ToMember();
+
+            return ExcludeMatching(x => x == member);
+        }
+
+        public AutomappingEntityBuilder<T> ExcludeMatching(Predicate<Member> predicate)
+        {
+            setup.AddExclusion(predicate);
             return this;
         }
     }

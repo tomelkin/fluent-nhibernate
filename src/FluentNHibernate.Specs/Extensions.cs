@@ -4,6 +4,7 @@ using System.Linq;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
+using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using Machine.Specifications;
@@ -60,7 +61,7 @@ namespace FluentNHibernate.Specs
         {
             var mappings = mapper.Map(new[]
             {
-                new AutomappingTarget(typeof(T), new ClassMapping { Type = typeof(T) }, new AutomappingInstructions())
+                new AutomappingTarget(typeof(T), new ClassMapping { Type = typeof(T) }, new EntityAutomappingInstructions(new AutomappingInstructions(), new AutomappingEntitySetup()))
             });
 
             return (ClassMapping)mappings.FirstOrDefault(x => x.Type == typeof(T));
@@ -94,7 +95,7 @@ namespace FluentNHibernate.Specs
     {
         public static PartialAutomapAction For<T>()
         {
-            return new PartialAutomapAction(Mapping.For<T>());
+            return new PartialAutomapAction(Mapping.For<T>(), new AutomappingEntitySetup());
         }
     }
 

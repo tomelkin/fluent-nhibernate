@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Automapping.Steps;
 using FluentNHibernate.Infrastructure;
+using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils.Reflection;
 using Iesi.Collections.Generic;
@@ -34,7 +35,7 @@ namespace FluentNHibernate.Testing.Automapping
 
         AutomappingTarget CreateTarget()
         {
-            return new AutomappingTarget(typeof(PropertyTarget), new ClassMapping { Type = typeof(PropertyTarget) }, new AutomappingInstructions());
+            return new AutomappingTarget(typeof(PropertyTarget), new ClassMapping { Type = typeof(PropertyTarget) }, new EntityAutomappingInstructions(new AutomappingInstructions(), new AutomappingEntitySetup()));
         }
 
         protected class PropertyTarget

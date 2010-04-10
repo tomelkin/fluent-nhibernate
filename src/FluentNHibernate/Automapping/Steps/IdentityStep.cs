@@ -18,7 +18,7 @@ namespace FluentNHibernate.Automapping.Steps
 
         public bool ShouldMap(AutomappingTarget target, Member member)
         {
-            return cfg.IsId(member);
+            return cfg.IsId(member) && !target.Mapping.HasId();
         }
 
         public IMemberMapping Map(AutomappingTarget target, Member member)

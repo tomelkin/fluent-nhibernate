@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FluentNHibernate.MappingModel.ClassBased;
 
 namespace FluentNHibernate.Infrastructure
@@ -7,13 +8,19 @@ namespace FluentNHibernate.Infrastructure
     {
         public Type Type { get; private set; }
         public ITopMapping Mapping { get; private set; }
-        public IAutomappingInstructions Instructions { get; private set; }
+        public IEntityAutomappingInstructions Instructions { get; private set; }
 
-        public AutomappingTarget(Type type, ITopMapping mapping, IAutomappingInstructions instructions)
+        public AutomappingTarget(Type type, ITopMapping mapping, IEntityAutomappingInstructions instructions)
         {
             Type = type;
             Mapping = mapping;
             Instructions = instructions;
+        }
+
+        public bool IsMemberUsed(Member member)
+        {
+            return Mapping.GetUsedMembers()
+                .Contains(member);
         }
     }
 }

@@ -25,27 +25,27 @@ namespace FluentNHibernate.Infrastructure
 
         public override object[] GetCustomAttributes(bool inherit)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Can't use GetCustomAttributes in a DummyPropertyInfo");
         }
 
         public override bool IsDefined(Type attributeType, bool inherit)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Can't use IsDefined in a DummyPropertyInfo");
         }
 
         public override object GetValue(object obj, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Can't use GetValue in a DummyPropertyInfo");
         }
 
         public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Can't use SetValue in a DummyPropertyInfo");
         }
 
         public override MethodInfo[] GetAccessors(bool nonPublic)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Can't use GetAccessors in a DummyPropertyInfo");
         }
 
         public override MethodInfo GetGetMethod(bool nonPublic)
@@ -60,7 +60,7 @@ namespace FluentNHibernate.Infrastructure
 
         public override ParameterInfo[] GetIndexParameters()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Can't use GetIndexParameters in a DummyPropertyInfo");
         }
 
         public override string Name
@@ -70,12 +70,12 @@ namespace FluentNHibernate.Infrastructure
 
         public override Type DeclaringType
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException("Can't use DeclaringType in a DummyPropertyInfo"); }
         }
 
         public override Type ReflectedType
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException("Can't use ReflectedType in a DummyPropertyInfo"); }
         }
 
         public override Type PropertyType
@@ -85,22 +85,22 @@ namespace FluentNHibernate.Infrastructure
 
         public override PropertyAttributes Attributes
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException("Can't use Attributes in a DummyPropertyInfo"); }
         }
 
         public override bool CanRead
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException("Can't use CanRead in a DummyPropertyInfo"); ; }
         }
 
         public override bool CanWrite
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException("Can't use CanWrite in a DummyPropertyInfo"); ; }
         }
 
         public override object[] GetCustomAttributes(Type attributeType, bool inherit)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Can't use GetCustomAttributes in a DummyPropertyInfo");
         }
     }
 }

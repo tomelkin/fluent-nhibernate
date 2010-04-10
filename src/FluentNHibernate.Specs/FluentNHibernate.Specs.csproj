@@ -73,6 +73,7 @@
     <Compile Include="Automapping\PrivateFieldsSpecs.cs" />
     <Compile Include="Automapping\V2\Fixtures\Entity.cs" />
     <Compile Include="Automapping\V2\V2Specs.cs" />
+    <Compile Include="Compiler\PartialAutomapActionSpecs.cs" />
     <Compile Include="Compiler\CompilerSpecs.cs" />
     <Compile Include="Compiler\Fixtures\Entity.cs" />
     <Compile Include="Compiler\Fixtures\FullyAutomappedEntity.cs" />

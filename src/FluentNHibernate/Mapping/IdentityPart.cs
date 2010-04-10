@@ -80,6 +80,7 @@ namespace FluentNHibernate.Mapping
             {
                 mapping.Name = columnName;
             }
+            mapping.Member = property;
             mapping.SetDefaultValue("Type", new TypeReference(identityType));
 
             if (GeneratedBy.IsDirty)

@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel.ClassBased;
 
 namespace FluentNHibernate.Infrastructure
@@ -6,19 +7,23 @@ namespace FluentNHibernate.Infrastructure
     public class PartialAutomapAction : IMappingAction
     {
         readonly ClassMapping mapping;
+        readonly AutomappingEntitySetup setup;
 
-        public PartialAutomapAction(Type type)
-            : this (new ClassMapping { Type = type })
+        public PartialAutomapAction(Type type, AutomappingEntitySetup setup)
+            : this (new ClassMapping { Type = type }, setup)
         {}
 
-        public PartialAutomapAction(ClassMapping mapping)
+        public PartialAutomapAction(ClassMapping mapping, AutomappingEntitySetup setup)
         {
             this.mapping = mapping;
+            this.setup = setup;
         }
 
         public AutomappingTarget CreateTarget(IAutomappingInstructions mainInstructions)
         {
-            return new AutomappingTarget(mapping.Type, mapping, new EntityAutomappingInstructions(mainInstructions));
+            var instructions = new EntityAutomappingInstructions(mainInstructions, setup);
+
+            return new AutomappingTarget(mapping.Type, mapping, instructions);
         }
     }
 }
