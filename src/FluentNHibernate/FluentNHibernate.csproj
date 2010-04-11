@@ -114,6 +114,7 @@
     <Compile Include="Infrastructure\ConfigurationAlterations.cs" />
     <Compile Include="Infrastructure\ConfigurationModifier.cs" />
     <Compile Include="Conventions\ConventionContainer.cs" />
+    <Compile Include="Infrastructure\DerivedPersistenceInstructions.cs" />
     <Compile Include="Infrastructure\EntityAutomappingInstructions.cs" />
     <Compile Include="Infrastructure\IMappingAction.cs" />
     <Compile Include="Infrastructure\ManualAction.cs" />

@@ -97,7 +97,8 @@ namespace FluentNHibernate.Infrastructure
             var partials = actions.Where(x => x is PartialAutomapAction);
 
             // combined automapping (do it all in one go)
-            yield return AutomapAction.ComposeFrom(partials);
+            if (partials.Any())
+                yield return AutomapAction.ComposeFrom(partials);
 
             // completely manual mappings
             foreach (var action in actions.Except(partials))

@@ -12,10 +12,10 @@ using NHibernate.Cfg;
 
 namespace FluentNHibernate
 {
-    public interface IPersistenceModel
+    public interface IPersistenceModel : IPersistenceInstructionGatherer
     {}
 
-    public class PersistenceModel : IPersistenceInstructionGatherer
+    public class PersistenceModel : IPersistenceModel
     {
         readonly List<ITypeSource> sources = new List<ITypeSource>();
         readonly List<IProvider> instances = new List<IProvider>();
@@ -24,6 +24,7 @@ namespace FluentNHibernate
         Action<Configuration> preConfigure;
         Action<Configuration> postConfigure;
         IAutomappingInstructions automapping;
+        IPersistenceInstructionGatherer baseModel;
 
         public AutomappingBuilder AutoMap
         {
@@ -73,21 +74,35 @@ namespace FluentNHibernate
         }
 
         /// <summary>
-        /// Base the PersistenceModel configuration on another PersistenceModel's setup.
+        /// Base this configuration on another <see cref="IPersistenceModel"/>'s setup.
         /// Use this method to "inherit" settings, that can be overwritten in your own
-        /// model.
+        /// model. This method can only be called once, multiple calls will result in only the last call
+        /// being used.
         /// </summary>
         /// <param name="model">PersistenceModel to inherit settings from</param>
         protected void BaseConfigurationOn(IPersistenceModel model)
         {
-            
+            BaseConfigurationOn((IPersistenceInstructionGatherer)model);
+        }
+
+        /// <summary>
+        /// Base this configuration on another <see cref="IPersistenceModel"/>'s setup.
+        /// Use this method to "inherit" settings, that can be overwritten in your own
+        /// model. This method can only be called once, multiple calls will result in only the last call
+        /// being used.
+        /// </summary>
+        /// <param name="instrucionGather">PersistenceModel to inherit settings from</param>
+        protected void BaseConfigurationOn(IPersistenceInstructionGatherer instrucionGather)
+        {
+            baseModel = instrucionGather;
         }
 
         /// <summary>
         /// Extend the PersistenceModel configuration with another PersistenceModel's setup.
         /// Use this method to apply existing settings "on top" of your own settings. Good
         /// for if you want to pass in a "test" configuration that just alters minor settings but
-        /// keeps everything else intact.
+        /// keeps everything else intact. This method can only be called once, multiple calls will
+        /// result in only the last call being used.
         /// </summary>
         /// <param name="model">PersistenceModel to extend your own with</param>
         protected void ExtendConfigurationWith(IPersistenceModel model)
@@ -97,6 +112,8 @@ namespace FluentNHibernate
 
         /// <summary>
         /// Supply settings for the database used in the persistence of your entities.
+        /// This method can only be called once, multiple calls will result in only
+        /// the last call being used.
         /// </summary>
         /// <remarks>
         /// Where the instance comes from that you pass into this method
@@ -129,6 +146,8 @@ namespace FluentNHibernate
 
         /// <summary>
         /// Supply settings for the database used in the persistence of your entities.
+        /// This method can only be called once, multiple calls will result in only
+        /// the last call being used.
         /// </summary>
         /// <example>
         /// See <see cref="Database(FluentNHibernate.Cfg.Db.IDatabaseConfiguration)"/> for examples.
@@ -142,7 +161,8 @@ namespace FluentNHibernate
 
         /// <summary>
         /// Supply settings, in the form of an inline setup, for the database used in the persistence
-        /// of your entities.
+        /// of your entities. This method can only be called once, multiple calls will result in only
+        /// the last call being used.
         /// </summary>
         /// <remarks>
         /// The parameter to this method will be wrapped inside a <see cref="IDatabaseConfiguration"/>
@@ -213,7 +233,7 @@ namespace FluentNHibernate
             }
         }
 
-        IPersistenceInstructions IPersistenceInstructionGatherer.GetInstructions()
+        IPersistenceInstructions CreateInstructions()
         {
             var instructions = new PersistenceInstructions();
             var actions = GetActions();
@@ -232,6 +252,16 @@ namespace FluentNHibernate
 
             if (automapping != null)
                 instructions.UseAutomappingInstructions(automapping);
+
+            return instructions;
+        }
+
+        IPersistenceInstructions IPersistenceInstructionGatherer.GetInstructions()
+        {
+            var instructions = CreateInstructions();
+            
+            if (baseModel != null)
+                instructions = new DerivedPersistenceInstructions(baseModel.GetInstructions(), instructions);
 
             return instructions;
         }
