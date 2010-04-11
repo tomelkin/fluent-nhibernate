@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
-using FluentNHibernate.Mapping;
 using FluentNHibernate.Utils;
 using FluentNHibernate.Utils.Reflection;
 using NHibernate.Cfg;
@@ -17,19 +14,11 @@ namespace FluentNHibernate
 
     public class PersistenceModel : IPersistenceModel
     {
-        readonly List<ITypeSource> sources = new List<ITypeSource>();
-        readonly List<IProvider> instances = new List<IProvider>();
-        readonly ConventionsCollection conventions = new ConventionsCollection();
-        IDatabaseConfiguration databaseConfiguration;
-        Action<Configuration> preConfigure;
-        Action<Configuration> postConfigure;
-        IAutomappingInstructions automapping;
-        IPersistenceInstructionGatherer baseModel;
-        IPersistenceInstructionGatherer extendedModel;
+        readonly PersistenceInstructionGatherer gatherer = new PersistenceInstructionGatherer();
 
         public AutomappingBuilder AutoMap
         {
-            get { return new AutomappingBuilder(automapping ?? (automapping = new AutomappingInstructions())); }
+            get { return new AutomappingBuilder(gatherer.Automapping); }
         }
 
         /// <summary>
@@ -57,7 +46,7 @@ namespace FluentNHibernate
         /// <param name="preConfigureAction">Action to execute</param>
         protected void PreConfigure(Action<Configuration> preConfigureAction)
         {
-            preConfigure = preConfigureAction;
+            gatherer.UsePreConfigure(preConfigureAction);
         }
 
         /// <summary>
@@ -71,7 +60,7 @@ namespace FluentNHibernate
         /// <param name="postConfigureAction">Action to execute</param>
         protected void PostConfigure(Action<Configuration> postConfigureAction)
         {
-            postConfigure = postConfigureAction;
+            gatherer.UsePostConfigure(postConfigureAction);
         }
 
         /// <summary>
@@ -95,7 +84,7 @@ namespace FluentNHibernate
         /// <param name="instrucionGather">PersistenceModel to inherit settings from</param>
         protected void BaseConfigurationOn(IPersistenceInstructionGatherer instrucionGather)
         {
-            baseModel = instrucionGather;
+            gatherer.UseBaseModel(instrucionGather);
         }
 
         /// <summary>
@@ -121,7 +110,7 @@ namespace FluentNHibernate
         /// <param name="instructionGatherer">PersistenceModel to extend your own with</param>
         protected void ExtendConfigurationWith(IPersistenceInstructionGatherer instructionGatherer)
         {
-            extendedModel = instructionGatherer;
+            gatherer.UseExtendModel(instructionGatherer);
         }
 
         /// <summary>
@@ -155,7 +144,7 @@ namespace FluentNHibernate
         /// <param name="dbCfg">Database configuration instance</param>
         protected void Database(IDatabaseConfiguration dbCfg)
         {
-            databaseConfiguration = dbCfg;
+            gatherer.UseDatabaseConfiguration(dbCfg);
         }
 
         /// <summary>
@@ -190,12 +179,12 @@ namespace FluentNHibernate
         /// <param name="db">Persistence configurer instance</param>
         protected void Database(IPersistenceConfigurer db)
         {
-            databaseConfiguration = new PreconfiguredDatabaseConfiguration(db);
+            gatherer.UseDatabaseConfiguration(new PreconfiguredDatabaseConfiguration(db));
         }
 
         public IConventionContainer Conventions
         {
-            get { return new ConventionContainer(conventions); }
+            get { return new ConventionContainer(gatherer.Conventions); }
         }
 
         protected void AddMappingsFromThisAssembly()
@@ -211,86 +200,22 @@ namespace FluentNHibernate
 
         public void Add(IProvider provider)
         {
-            instances.Add(provider);
+            gatherer.AddProviderInstance(provider);
         }
 
         public void AddMappingsFromSource(ITypeSource source)
         {
-            sources.Add(source);
+            gatherer.AddSource(source);
         }
 
         public void AddMappings(params IProvider[] providers)
         {
-            instances.AddRange(providers);
-        }
-
-        IEnumerable<IMappingAction> GetActions()
-        {
-            var actionsFromInstances = instances.Select(x => x.GetAction());
-            var actionsFromProviders = GetProvidersFromSources().Select(x => x.GetAction());
-
-            // all pre-instantiated providers)
-            foreach (var action in actionsFromInstances)
-                yield return action;
-
-            // all providers found by scanning
-            foreach (var action in actionsFromProviders)
-                yield return action;
-
-            // all types for mapping by the automapper
-            if (automapping != null)
-            {
-                var actionsForAutomapping = automapping.GetTypesToMap().Select(x => new PartialAutomapAction(x, new AutomappingEntitySetup()));
-                
-                foreach (var action in actionsForAutomapping)
-                    yield return action;
-            }
-        }
-
-        IPersistenceInstructions CreateInstructions()
-        {
-            var instructions = new PersistenceInstructions();
-            var actions = GetActions();
-
-            instructions.AddActions(actions);
-            instructions.UseConventions(conventions);
-
-            if (databaseConfiguration != null)
-                instructions.UseDatabaseConfiguration(databaseConfiguration);
-
-            if (preConfigure != null)
-                instructions.UsePreConfigureAction(preConfigure);
-
-            if (postConfigure != null)
-                instructions.UsePostConfigureAction(postConfigure);
-
-            if (automapping != null)
-                instructions.UseAutomappingInstructions(automapping);
-
-            return instructions;
+            providers.Each(gatherer.AddProviderInstance);
         }
 
         IPersistenceInstructions IPersistenceInstructionGatherer.GetInstructions()
         {
-            var instructions = CreateInstructions();
-            
-            if (baseModel != null)
-                instructions = new DerivedPersistenceInstructions(baseModel.GetInstructions(), instructions);
-
-            if (extendedModel != null)
-                instructions = new ExtendedPersistenceInstructions(extendedModel.GetInstructions(), instructions);
-
-            return instructions;
-        }
-
-        IEnumerable<IProvider> GetProvidersFromSources()
-        {
-            // TODO: Add user-defined filtering in here
-            return sources
-                .SelectMany(x => x.GetTypes())
-                .Where(x => x.HasInterface<IProvider>())
-                .Select(x => x.InstantiateUsingParameterlessConstructor())
-                .Cast<IProvider>();
+            return gatherer.GetInstructions();
         }
     }
 }
