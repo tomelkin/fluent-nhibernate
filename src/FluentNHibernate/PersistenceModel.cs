@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
@@ -32,11 +30,43 @@ namespace FluentNHibernate
             get { return new AutomappingBuilder(automapping ?? (automapping = new AutomappingInstructions())); }
         }
 
+        /// <summary>
+        /// Specify an action that is executed before any changes are made by Fluent NHibernate to
+        /// the NHibernate <see cref="Configuration"/> instance. This method can only be called once,
+        /// multiple calls will result in only the last call being used.
+        /// </summary>
+        /// <example>
+        /// 1:
+        /// <code>
+        /// PreConfigure(cfg =>
+        /// {
+        /// });
+        /// </code>
+        /// 
+        /// 2:
+        /// <code>
+        /// PreConfigure(someMethod);
+        /// 
+        /// private void someMethod(Configuration cfg)
+        /// {
+        /// }
+        /// </code>
+        /// </example>
+        /// <param name="preConfigureAction">Action to execute</param>
         protected void PreConfigure(Action<Configuration> preConfigureAction)
         {
             preConfigure = preConfigureAction;
         }
 
+        /// <summary>
+        /// Specify an action that is executed after all other changes have been made by Fluent
+        /// NHibernate to the NHibernate <see cref="Configuration"/> instance. This method can
+        /// only be called once, multiple calls will result in only the last call being used.
+        /// </summary>
+        /// <example>
+        /// See <see cref="PreConfigure"/> for examples.
+        /// </example>
+        /// <param name="postConfigureAction">Action to execute</param>
         protected void PostConfigure(Action<Configuration> postConfigureAction)
         {
             postConfigure = postConfigureAction;

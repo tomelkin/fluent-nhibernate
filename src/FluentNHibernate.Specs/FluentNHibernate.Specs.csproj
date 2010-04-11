@@ -108,6 +108,11 @@
     <Compile Include="FluentInterface\SubclassMapSpecs\SubclassMapSpecs.HasOne.cs" />
     <Compile Include="FluentInterface\SubclassMapSpecs\SubclassMapSpecs.Property.cs" />
     <Compile Include="MappingAssertions.cs" />
+    <Compile Include="PersistenceModelSpecs\Fixtures\Extensions.cs" />
+    <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithPostConfigure.cs" />
+    <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithPreConfigure.cs" />
+    <Compile Include="PersistenceModelSpecs\PostConfigureSpecs.cs" />
+    <Compile Include="PersistenceModelSpecs\PreConfigureSpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\Fixtures\Target.cs" />
     <Compile Include="Utilities\Fixtures\TargetParent.cs" />
