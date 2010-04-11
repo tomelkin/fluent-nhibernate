@@ -1,4 +1,5 @@
-﻿using NHibernate.Cfg;
+﻿using System;
+using NHibernate.Cfg;
 
 namespace FluentNHibernate.Cfg.Db
 {
@@ -9,6 +10,11 @@ namespace FluentNHibernate.Cfg.Db
         public PreconfiguredDatabaseConfiguration(IPersistenceConfigurer db)
         {
             this.db = db;
+        }
+
+        public IPersistenceConfigurer Configurer
+        {
+            get { return db; }
         }
 
         public void Configure(Configuration cfg)

@@ -17,6 +17,12 @@ namespace FluentNHibernate.Infrastructure
         IEnumerable<IMappingAction> GetActions();
         ConventionsCollection Conventions { get; }
         IEnumerable<IMappingModelVisitor> Visitors { get; }
+        
+        /// <summary>
+        /// Gets the database configuration settings. These are
+        /// applied to the NHibernate configuration as part of the
+        /// configuration process.
+        /// </summary>
         IDatabaseConfiguration Database { get; }
 
         /// <summary>
@@ -47,6 +53,11 @@ namespace FluentNHibernate.Infrastructure
             AutomappingInstructions = new NullAutomappingInstructions();
         }
 
+        /// <summary>
+        /// Gets the database configuration settings. These are
+        /// applied to the NHibernate configuration as part of the
+        /// configuration process.
+        /// </summary>
         public IDatabaseConfiguration Database { get; private set; }
 
         /// <summary>
@@ -103,6 +114,10 @@ namespace FluentNHibernate.Infrastructure
             Conventions = collection;
         }
 
+        /// <summary>
+        /// Specifies the database configuration to use when configuring NHibernate.
+        /// </summary>
+        /// <param name="dbCfg">Database configuration instance</param>
         public void UseDatabaseConfiguration(IDatabaseConfiguration dbCfg)
         {
             Database = dbCfg;

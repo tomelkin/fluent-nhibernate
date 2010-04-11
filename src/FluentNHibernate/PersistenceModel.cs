@@ -95,14 +95,68 @@ namespace FluentNHibernate
             
         }
 
-        protected void Database(IPersistenceConfigurer db)
-        {
-            databaseConfiguration = new PreconfiguredDatabaseConfiguration(db);
-        }
-
+        /// <summary>
+        /// Supply settings for the database used in the persistence of your entities.
+        /// </summary>
+        /// <remarks>
+        /// Where the instance comes from that you pass into this method
+        /// is up to you. You can instantiate it yourself, or you could
+        /// inject it into your <see cref="PersistenceModel"/> via a
+        /// container and pass it into this method.
+        /// </remarks>
+        /// <example>
+        /// Inline:
+        /// <code>
+        /// Database(new ProductionDatabaseConfiguration());
+        /// </code>
+        /// 
+        /// Container:
+        /// <code>
+        /// public class MyPersistenceModel : PersistenceModel
+        /// {
+        ///   public MyPersistenceModel(IDatabaseConfiguration dbCfg)
+        ///   {
+        ///     Database(dbCfg);
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
+        /// <param name="dbCfg">Database configuration instance</param>
         protected void Database(IDatabaseConfiguration dbCfg)
         {
             databaseConfiguration = dbCfg;
+        }
+
+        /// <summary>
+        /// Supply settings for the database used in the persistence of your entities.
+        /// </summary>
+        /// <example>
+        /// See <see cref="Database(FluentNHibernate.Cfg.Db.IDatabaseConfiguration)"/> for examples.
+        /// </example>
+        /// <typeparam name="T">Type of database configuration</typeparam>
+        protected void Database<T>()
+            where T : IDatabaseConfiguration, new()
+        {
+            Database(new T());
+        }
+
+        /// <summary>
+        /// Supply settings, in the form of an inline setup, for the database used in the persistence
+        /// of your entities.
+        /// </summary>
+        /// <remarks>
+        /// The parameter to this method will be wrapped inside a <see cref="IDatabaseConfiguration"/>
+        /// instance. This method is mainly useful for short inline database configuration.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// Database(SQLiteConfiguration.StandardInMemory);
+        /// </code>
+        /// </example>
+        /// <param name="db">Persistence configurer instance</param>
+        protected void Database(IPersistenceConfigurer db)
+        {
+            databaseConfiguration = new PreconfiguredDatabaseConfiguration(db);
         }
 
         public IConventionContainer Conventions

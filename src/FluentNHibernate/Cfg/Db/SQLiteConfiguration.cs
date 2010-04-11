@@ -10,6 +10,11 @@ namespace FluentNHibernate.Cfg.Db
             get { return new SQLiteConfiguration(); }
         }
 
+        public static SQLiteConfiguration StandardInMemory
+        {
+            get { return Standard.InMemory(); }
+        }
+
         public SQLiteConfiguration()
         {
             Driver<SQLite20Driver>();
