@@ -25,6 +25,7 @@ namespace FluentNHibernate
         Action<Configuration> postConfigure;
         IAutomappingInstructions automapping;
         IPersistenceInstructionGatherer baseModel;
+        IPersistenceInstructionGatherer extendedModel;
 
         public AutomappingBuilder AutoMap
         {
@@ -98,7 +99,7 @@ namespace FluentNHibernate
         }
 
         /// <summary>
-        /// Extend the PersistenceModel configuration with another PersistenceModel's setup.
+        /// Extend ththis configuration with another PersistenceModel's setup.
         /// Use this method to apply existing settings "on top" of your own settings. Good
         /// for if you want to pass in a "test" configuration that just alters minor settings but
         /// keeps everything else intact. This method can only be called once, multiple calls will
@@ -107,7 +108,20 @@ namespace FluentNHibernate
         /// <param name="model">PersistenceModel to extend your own with</param>
         protected void ExtendConfigurationWith(IPersistenceModel model)
         {
-            
+            ExtendConfigurationWith((IPersistenceInstructionGatherer)model);
+        }
+
+        /// <summary>
+        /// Extend ththis configuration with another PersistenceModel's setup.
+        /// Use this method to apply existing settings "on top" of your own settings. Good
+        /// for if you want to pass in a "test" configuration that just alters minor settings but
+        /// keeps everything else intact. This method can only be called once, multiple calls will
+        /// result in only the last call being used.
+        /// </summary>
+        /// <param name="instructionGatherer">PersistenceModel to extend your own with</param>
+        protected void ExtendConfigurationWith(IPersistenceInstructionGatherer instructionGatherer)
+        {
+            extendedModel = instructionGatherer;
         }
 
         /// <summary>
@@ -262,6 +276,9 @@ namespace FluentNHibernate
             
             if (baseModel != null)
                 instructions = new DerivedPersistenceInstructions(baseModel.GetInstructions(), instructions);
+
+            if (extendedModel != null)
+                instructions = new ExtendedPersistenceInstructions(extendedModel.GetInstructions(), instructions);
 
             return instructions;
         }

@@ -109,6 +109,7 @@
     <Compile Include="Automapping\Steps\IAutomappingStep.cs" />
     <Compile Include="Infrastructure\AutomapAction.cs" />
     <Compile Include="Infrastructure\AutomappingTarget.cs" />
+    <Compile Include="Infrastructure\CombinatorPersistenceInstructions.cs" />
     <Compile Include="Infrastructure\CombinedAssemblyTypeSource.cs" />
     <Compile Include="Infrastructure\CompilationResult.cs" />
     <Compile Include="Infrastructure\ConfigurationAlterations.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Conventions\ConventionContainer.cs" />
     <Compile Include="Infrastructure\DerivedPersistenceInstructions.cs" />
     <Compile Include="Infrastructure\EntityAutomappingInstructions.cs" />
+    <Compile Include="Infrastructure\ExtendedPersistenceInstructions.cs" />
     <Compile Include="Infrastructure\IMappingAction.cs" />
     <Compile Include="Infrastructure\ManualAction.cs" />
     <Compile Include="Infrastructure\PartialAutomapAction.cs" />

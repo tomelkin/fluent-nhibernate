@@ -1,6 +1,4 @@
-﻿using FluentNHibernate.Conventions;
-
-namespace FluentNHibernate.Specs.PersistenceModelSpecs.Fixtures
+﻿namespace FluentNHibernate.Specs.PersistenceModelSpecs.Fixtures
 {
     class PersistenceModelWithBaseConfiguration : PersistenceModel
     {
@@ -10,20 +8,11 @@ namespace FluentNHibernate.Specs.PersistenceModelSpecs.Fixtures
         }
     }
 
-    class PersistenceModelWithBaseConfigurationAndEverythingSet : PersistenceModelWithBaseConfiguration
+    class PersistenceModelWithBaseConfigurationAndEverythingSet : PersistenceModelWithEverythingSet
     {
         public PersistenceModelWithBaseConfigurationAndEverythingSet(IPersistenceModel baseConfiguration)
-            : base(baseConfiguration)
         {
-            AutoMap.ThisAssembly();
-            Conventions.Add(new StubConvention());
-            Database(new StubDatabaseConfiguration());
-            PreConfigure(cfg => method());
-            PostConfigure(cfg => method());
+            BaseConfigurationOn(baseConfiguration);
         }
-
-        void method() {}
-
-        class StubConvention : IConvention {}
     }
 }

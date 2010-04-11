@@ -109,12 +109,15 @@
     <Compile Include="FluentInterface\SubclassMapSpecs\SubclassMapSpecs.Property.cs" />
     <Compile Include="MappingAssertions.cs" />
     <Compile Include="PersistenceModelSpecs\BaseConfigurationOnSpecs.cs" />
+    <Compile Include="PersistenceModelSpecs\ExtendConfigurationWithSpecs.cs" />
     <Compile Include="PersistenceModelSpecs\DatabaseSpecs.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\Extensions.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\MockDatabaseConfiguration.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithBaseConfiguration.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithDatabase.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithDatabaseAsPersistenceConfigurer.cs" />
+    <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithEverythingSet.cs" />
+    <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithExtendedConfigurationAndEverythingSet.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithPostConfigure.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\PersistenceModelWithPreConfigure.cs" />
     <Compile Include="PersistenceModelSpecs\Fixtures\StubAction.cs" />
