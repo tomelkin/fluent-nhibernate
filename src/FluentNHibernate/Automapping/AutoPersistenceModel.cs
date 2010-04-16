@@ -120,7 +120,7 @@ namespace FluentNHibernate.Automapping
 
             foreach (var type in mappingTypes)
             {
-                if (type.Type.IsClass && IsNotAnonymousMethodClass(type))
+                if (type.Type.IsClass && IsNotInnerClass(type))
                 {
                     if (!type.IsMapped)
                     {
@@ -144,7 +144,7 @@ namespace FluentNHibernate.Automapping
             base.Configure(configuration);
         }
 
-        private static bool IsNotAnonymousMethodClass(AutoMapType type)
+        private static bool IsNotInnerClass(AutoMapType type)
         {
             return type.Type.ReflectedType == null;
         }

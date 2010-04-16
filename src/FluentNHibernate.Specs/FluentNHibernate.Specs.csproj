@@ -60,9 +60,12 @@
   <ItemGroup>
     <Compile Include="Automapping\AutomappingSpecs.Properties.Enum.cs" />
     <Compile Include="Automapping\AutomappingSpecs.ElementCollections.cs" />
+    <Compile Include="Automapping\Fixtures\AutomappingSpecExtensions.cs" />
     <Compile Include="Automapping\Fixtures\EntityWithStaticProperties.cs" />
+    <Compile Include="Automapping\Fixtures\EntityUsingPrivateFields.cs" />
     <Compile Include="Automapping\Fixtures\FakeMembers.cs" />
     <Compile Include="Automapping\Fixtures\StubTypeSource.cs" />
+    <Compile Include="Automapping\PrivateFieldsSpecs.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FluentInterface\ClasslikeBehaviors.cs" />
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Cache.cs" />

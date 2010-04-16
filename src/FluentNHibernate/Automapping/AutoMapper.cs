@@ -114,13 +114,12 @@ namespace FluentNHibernate.Automapping
 
         public virtual void ProcessClass(ClassMappingBase mapping, Type entityType, IList<Member> mappedMembers)
         {
-            foreach (var member in entityType.GetInstanceMembers())
-            {
-                TryToMapProperty(mapping, member, mappedMembers);
-            }
+            entityType.GetInstanceMembers()
+                .Where(expressions.FindMembers)
+                .Each(x => TryMapProperty(mapping, x, mappedMembers));
         }
 
-        protected void TryToMapProperty(ClassMappingBase mapping, Member member, IList<Member> mappedMembers)
+        void TryMapProperty(ClassMappingBase mapping, Member member, IList<Member> mappedMembers)
         {
             if (member.HasIndexParameters) return;
 

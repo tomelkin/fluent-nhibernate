@@ -101,7 +101,6 @@
     <Compile Include="Automapping\IPropertyIgnorer.cs" />
     <Compile Include="CombinedAssemblyTypeSource.cs" />
     <Compile Include="ITypeSource.cs" />
-    <Compile Include="Automapping\PrivateAutoMapper.cs" />
     <Compile Include="Automapping\PrivateAutoPersistenceModel.cs" />
     <Compile Include="Automapping\SubclassStrategy.cs" />
     <Compile Include="Cfg\Db\DB2Configuration.cs" />

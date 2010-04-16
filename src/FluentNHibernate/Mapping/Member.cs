@@ -19,7 +19,10 @@ namespace FluentNHibernate
         public abstract bool IsMethod { get; }
         public abstract bool IsField { get; }
         public abstract bool IsProperty { get; }
-        //   GetIndexParameters().Length == 0
+        public abstract bool IsPrivate { get; }
+        public abstract bool IsProtected { get; }
+        public abstract bool IsPublic { get; }
+        public abstract bool IsInternal { get; }
 
         public bool Equals(Member other)
         {
@@ -55,30 +58,30 @@ namespace FluentNHibernate
 
     internal class FieldMember : Member
     {
-        private readonly FieldInfo _fieldInfo;
+        private readonly FieldInfo member;
 
         public override void SetValue(object target, object value)
         {
-            _fieldInfo.SetValue(target, value);
+            member.SetValue(target, value);
         }
 
         public override object GetValue(object target)
         {
-            return _fieldInfo.GetValue(target);
+            return member.GetValue(target);
         }
 
-        public FieldMember(FieldInfo fieldInfo)
+        public FieldMember(FieldInfo member)
         {
-            _fieldInfo = fieldInfo;
+            this.member = member;
         }
 
         public override string Name
         {
-            get { return _fieldInfo.Name; }
+            get { return member.Name; }
         }
         public override Type PropertyType
         {
-            get { return _fieldInfo.FieldType; }
+            get { return member.FieldType; }
         }
         public override bool CanWrite
         {
@@ -86,11 +89,11 @@ namespace FluentNHibernate
         }
         public override MemberInfo MemberInfo
         {
-            get { return _fieldInfo; }
+            get { return member; }
         }
         public override Type DeclaringType
         {
-            get { return _fieldInfo.DeclaringType; }
+            get { return member.DeclaringType; }
         }
         public override bool HasIndexParameters
         {
@@ -108,11 +111,31 @@ namespace FluentNHibernate
         {
             get { return false; }
         }
+
+        public override bool IsPrivate
+        {
+            get { return member.IsPrivate; }
+        }
+
+        public override bool IsProtected
+        {
+            get { return member.IsFamily || member.IsFamilyAndAssembly; }
+        }
+
+        public override bool IsPublic
+        {
+            get { return member.IsPublic; }
+        }
+
+        public override bool IsInternal
+        {
+            get { return member.IsAssembly || member.IsFamilyAndAssembly; }
+        }
     }
 
     internal class MethodMember : Member
     {
-        private readonly MethodInfo _methodInfo;
+        private readonly MethodInfo member;
 
         public override void SetValue(object target, object value)
         {
@@ -121,21 +144,21 @@ namespace FluentNHibernate
 
         public override object GetValue(object target)
         {
-            return _methodInfo.Invoke(target, null);
+            return member.Invoke(target, null);
         }
 
-        public MethodMember(MethodInfo propertyInfo)
+        public MethodMember(MethodInfo member)
         {
-            _methodInfo = propertyInfo;
+            this.member = member;
         }
 
         public override string Name
         {
-            get { return _methodInfo.Name; }
+            get { return member.Name; }
         }
         public override Type PropertyType
         {
-            get { return _methodInfo.ReturnType; }
+            get { return member.ReturnType; }
         }
         public override bool CanWrite
         {
@@ -143,11 +166,11 @@ namespace FluentNHibernate
         }
         public override MemberInfo MemberInfo
         {
-            get { return _methodInfo; }
+            get { return member; }
         }
         public override Type DeclaringType
         {
-            get { return _methodInfo.DeclaringType; }
+            get { return member.DeclaringType; }
         }
         public override bool HasIndexParameters
         {
@@ -164,51 +187,87 @@ namespace FluentNHibernate
         public override bool IsProperty
         {
             get { return false; }
+        }
+
+        public override bool IsPrivate
+        {
+            get { return member.IsPrivate; }
+        }
+
+        public override bool IsProtected
+        {
+            get { return member.IsFamily || member.IsFamilyAndAssembly; }
+        }
+
+        public override bool IsPublic
+        {
+            get { return member.IsPublic; }
+        }
+
+        public override bool IsInternal
+        {
+            get { return member.IsAssembly || member.IsFamilyAndAssembly; }
+        }
+    }
+
+    public static class AndAndExtention
+    {
+        public static Return AndAnd<This, Return>(this This instance, Func<This, Return> evaluate)
+            where This : class
+        {
+            if (instance != null)
+                return evaluate(instance);
+
+            return default(Return);
         }
     }
 
     internal class PropertyMember : Member
     {
-        private readonly PropertyInfo _propertyInfo;
+        private readonly PropertyInfo member;
+        MethodMember getMethod;
+        MethodMember setMethod;
 
-        public PropertyMember(PropertyInfo propertyInfo)
+        public PropertyMember(PropertyInfo member)
         {
-            _propertyInfo = propertyInfo;
+            this.member = member;
+            getMethod = member.GetGetMethod().AndAnd(_ => (MethodMember)_.ToMember());
+            setMethod = member.GetSetMethod().AndAnd(_ => (MethodMember)_.ToMember());
         }
 
         public override void SetValue(object target, object value)
         {
-            _propertyInfo.SetValue(target, value, null);
+            member.SetValue(target, value, null);
         }
 
         public override object GetValue(object target)
         {
-            return _propertyInfo.GetValue(target, null);
+            return member.GetValue(target, null);
         }
 
         public override string Name
         {
-            get { return _propertyInfo.Name; }
+            get { return member.Name; }
         }
         public override Type PropertyType
         {
-            get { return _propertyInfo.PropertyType; }
+            get { return member.PropertyType; }
         }
         public override bool CanWrite
         {
-            get { return _propertyInfo.CanWrite; }
+            get { return member.CanWrite; }
         }
         public override MemberInfo MemberInfo
         {
-            get { return _propertyInfo; }
+            get { return member; }
         }
         public override Type DeclaringType
         {
-            get { return _propertyInfo.DeclaringType; }
+            get { return member.DeclaringType; }
         }
         public override bool HasIndexParameters
         {
-            get { return _propertyInfo.GetIndexParameters().Length > 0; }
+            get { return member.GetIndexParameters().Length > 0; }
         }
         public override bool IsMethod
         {
@@ -221,6 +280,36 @@ namespace FluentNHibernate
         public override bool IsProperty
         {
             get { return true; }
+        }
+
+        public override bool IsPrivate
+        {
+            get { return getMethod.IsPrivate; }
+        }
+
+        public override bool IsProtected
+        {
+            get { return getMethod.IsProtected; }
+        }
+
+        public override bool IsPublic
+        {
+            get { return getMethod.IsPublic; }
+        }
+
+        public override bool IsInternal
+        {
+            get { return getMethod.IsInternal; }
+        }
+
+        public MethodMember Get
+        {
+            get { return getMethod; }
+        }
+
+        public MethodMember Set
+        {
+            get { return setMethod; }
         }
     }
 
@@ -228,21 +317,33 @@ namespace FluentNHibernate
     {
         public static Member ToMember(this PropertyInfo propertyInfo)
         {
+            if (propertyInfo == null)
+                throw new NullReferenceException("Cannot create member from null.");
+            
             return new PropertyMember(propertyInfo);
         }
 
         public static Member ToMember(this MethodInfo methodInfo)
         {
+            if (methodInfo == null)
+                throw new NullReferenceException("Cannot create member from null.");
+
             return new MethodMember(methodInfo);
         }
 
         public static Member ToMember(this FieldInfo fieldInfo)
         {
+            if (fieldInfo == null)
+                throw new NullReferenceException("Cannot create member from null.");
+
             return new FieldMember(fieldInfo);
         }
 
         public static Member ToMember(this MemberInfo memberInfo)
         {
+            if (memberInfo == null)
+                throw new NullReferenceException("Cannot create member from null.");
+
             if (memberInfo is PropertyInfo)
                 return ((PropertyInfo)memberInfo).ToMember();
             if (memberInfo is FieldInfo)

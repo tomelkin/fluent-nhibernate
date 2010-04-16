@@ -8,12 +8,16 @@ namespace FluentNHibernate
     public class AutoMappingExpressions
     {
         /// <summary>
-        /// Determines whether a property is the identity of an entity.
+        /// Determines whether a member is to be automapped. 
         /// </summary>
-        public Func<Member, bool> FindIdentity = p => p.Name == "Id";
+        public Func<Member, bool> FindMembers = m => m.IsProperty && m.CanWrite;
+
+        /// <summary>
+        /// Determines whether a member is the identity of an entity.
+        /// </summary>
+        public Func<Member, bool> FindIdentity = m => m.Name.Equals("id", StringComparison.InvariantCultureIgnoreCase);
 
         public Func<Type, Type, Type> GetParentSideForManyToMany = (one, two) => one.FullName.CompareTo(two.FullName) < 0 ? one : two;
-        public Func<Member, bool> FindMappablePrivateProperties;
 
         [Obsolete("Use IgnoreBase<T> or IgnoreBase(Type): AutoMap.AssemblyOf<Entity>().IgnoreBase(typeof(Parent<>))")]
         public Func<Type, bool> IsBaseType = b => b == typeof(object);

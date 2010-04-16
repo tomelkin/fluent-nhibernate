@@ -50,12 +50,12 @@ namespace FluentNHibernate
 
         public override MethodInfo GetGetMethod(bool nonPublic)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public override MethodInfo GetSetMethod(bool nonPublic)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public override ParameterInfo[] GetIndexParameters()

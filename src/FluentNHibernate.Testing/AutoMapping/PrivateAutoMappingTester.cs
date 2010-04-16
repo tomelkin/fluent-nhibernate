@@ -48,7 +48,7 @@ namespace FluentNHibernate.Testing.Automapping
         private void Model<T>(Func<Member, bool> convention)
         {
             model = new PrivateAutoPersistenceModel()
-                .Setup(conventions => conventions.FindMappablePrivateProperties = convention);
+                .Setup(conventions => conventions.FindMembers = convention);
             model.ValidationEnabled = false;
             model.AddTypeSource(new StubTypeSource(typeof(T)));
             model.BuildMappings();

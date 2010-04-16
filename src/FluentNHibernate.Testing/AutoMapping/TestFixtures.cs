@@ -98,14 +98,7 @@ namespace FluentNHibernate.Automapping.TestFixtures
 
     public class PrivateIdSetterClass
     {
-#pragma warning disable 649
-        private int id;
-#pragma warning restore 649
-
-        public virtual int Id
-        {
-            get { return id; }
-        }
+        public virtual int Id { get; private set; }
     }
 
 
