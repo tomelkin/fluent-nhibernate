@@ -30,7 +30,7 @@ namespace FluentNHibernate
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(Member)) return false;
+            if (!(obj is Member)) return false;
             return Equals((Member)obj);
         }
 

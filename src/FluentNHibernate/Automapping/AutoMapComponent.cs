@@ -32,7 +32,7 @@ namespace FluentNHibernate.Automapping
             };
 
             mapper.FlagAsMapped(property.PropertyType);
-            mapper.MergeMap(property.PropertyType, mapping, new List<string>());
+            mapper.MergeMap(property.PropertyType, mapping, new List<Member>());
 
             classMap.AddComponent(mapping);
         }

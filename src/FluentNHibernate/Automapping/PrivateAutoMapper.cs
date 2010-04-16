@@ -17,7 +17,7 @@ namespace FluentNHibernate.Automapping
             localExpressions = expressions;
         }
 
-        public override void MapEverythingInClass(ClassMappingBase mapping, Type entityType, IList<string> mappedProperties)
+        public override void ProcessClass(ClassMappingBase mapping, Type entityType, IList<Member> mappedMembers)
         {
             // This will ONLY map private properties. Do not call base.
 
@@ -28,7 +28,7 @@ namespace FluentNHibernate.Automapping
             foreach (var property in entityType.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic).Select(x => x.ToMember()))
             {
                 if (rule(property))
-                    TryToMapProperty(mapping, property, mappedProperties);
+                    TryToMapProperty(mapping, property, mappedMembers);
             }
         }
     }

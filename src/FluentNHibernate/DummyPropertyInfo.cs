@@ -18,6 +18,11 @@ namespace FluentNHibernate
             this.type = type;
         }
 
+        public override int MetadataToken
+        {
+            get { return name.GetHashCode(); }
+        }
+
         public override object[] GetCustomAttributes(bool inherit)
         {
             throw new NotImplementedException();
