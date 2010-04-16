@@ -23,7 +23,7 @@ namespace FluentNHibernate
 
         public bool Equals(Member other)
         {
-            return !ReferenceEquals(null, other);
+            return other.MemberInfo.MetadataToken.Equals(MemberInfo.MetadataToken);
         }
 
         public override bool Equals(object obj)
@@ -36,7 +36,7 @@ namespace FluentNHibernate
 
         public override int GetHashCode()
         {
-            return 0;
+            return MemberInfo.GetHashCode() ^ 3;
         }
 
         public static bool operator ==(Member left, Member right)
@@ -56,24 +56,6 @@ namespace FluentNHibernate
     internal class FieldMember : Member
     {
         private readonly FieldInfo _fieldInfo;
-
-        public bool Equals(FieldMember other)
-        {
-            return !ReferenceEquals(null, other);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(FieldMember)) return false;
-            return Equals((FieldMember)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return 0;
-        }
 
         public override void SetValue(object target, object value)
         {
@@ -131,24 +113,6 @@ namespace FluentNHibernate
     internal class MethodMember : Member
     {
         private readonly MethodInfo _methodInfo;
-
-        public bool Equals(MethodMember other)
-        {
-            return !ReferenceEquals(null, other);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(MethodMember)) return false;
-            return Equals((MethodMember)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return 0;
-        }
 
         public override void SetValue(object target, object value)
         {
@@ -210,24 +174,6 @@ namespace FluentNHibernate
         public PropertyMember(PropertyInfo propertyInfo)
         {
             _propertyInfo = propertyInfo;
-        }
-
-        public bool Equals(PropertyMember other)
-        {
-            return !ReferenceEquals(null, other);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(PropertyMember)) return false;
-            return Equals((PropertyMember)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return 0;
         }
 
         public override void SetValue(object target, object value)
@@ -305,6 +251,53 @@ namespace FluentNHibernate
                 return ((MethodInfo)memberInfo).ToMember();
 
             throw new InvalidOperationException("Cannot convert MemberInfo '" + memberInfo.Name + "' to Member.");
+        }
+
+        public static IEnumerable<Member> GetInstanceFields(this Type type)
+        {
+            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                if (!field.Name.StartsWith("<"))
+                    yield return field.ToMember();
+        }
+
+        public static IEnumerable<Member> GetInstanceMethods(this Type type)
+        {
+            foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                if (!method.Name.StartsWith("get_") && !method.Name.StartsWith("set_") && method.ReturnType != typeof(void) && method.GetParameters().Length == 0)
+                    yield return method.ToMember();
+        }
+
+        public static IEnumerable<Member> GetInstanceProperties(this Type type)
+        {
+            foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                yield return property.ToMember();
+        }
+
+        public static IEnumerable<Member> GetInstanceMembers(this Type type)
+        {
+            var members = new HashSet<Member>(new MemberEqualityComparer());
+
+            type.GetInstanceProperties().Each(x => members.Add(x));
+            type.GetInstanceFields().Each(x => members.Add(x));
+            type.GetInstanceMethods().Each(x => members.Add(x));
+
+            if (type.BaseType != typeof(object))
+                type.BaseType.GetInstanceMembers().Each(x => members.Add(x));
+
+            return members;
+        }
+    }
+
+    public class MemberEqualityComparer : IEqualityComparer<Member>
+    {
+        public bool Equals(Member x, Member y)
+        {
+            return x.MemberInfo.MetadataToken.Equals(y.MemberInfo.MetadataToken);
+        }
+
+        public int GetHashCode(Member obj)
+        {
+            return obj.MemberInfo.MetadataToken.GetHashCode();
         }
     }
 }
