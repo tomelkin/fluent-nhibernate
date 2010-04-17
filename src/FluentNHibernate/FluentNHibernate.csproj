@@ -68,7 +68,6 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AutoMappingExpressions.cs" />
     <Compile Include="Automapping\Alterations\AutoMappingOverrideAlteration.cs" />
     <Compile Include="Automapping\Alterations\IAutoMappingAlteration.cs" />
     <Compile Include="Automapping\Alterations\IAutoMappingOverride.cs" />
@@ -88,15 +87,18 @@
     <Compile Include="Automapping\AutoMapper.cs" />
     <Compile Include="Automapping\AutoMappingAlterationCollection.cs" />
     <Compile Include="Automapping\AutoMappingException.cs" />
+    <Compile Include="Automapping\AutoMappingExpressions.cs" />
     <Compile Include="Automapping\AutoMapProperty.cs" />
     <Compile Include="Automapping\AutoMapType.cs" />
     <Compile Include="Automapping\AutoMapVersion.cs" />
     <Compile Include="Automapping\AutoPersistenceModel.cs" />
     <Compile Include="Automapping\AutoSimpleTypeCollection.cs" />
     <Compile Include="Automapping\AutoSubClassPart.cs" />
+    <Compile Include="Automapping\DefaultAutomappingConfiguration.cs" />
     <Compile Include="Automapping\IAutoClasslike.cs" />
     <Compile Include="Automapping\IAutoMapper.cs" />
     <Compile Include="Automapping\IAutoMappingAlteration.cs" />
+    <Compile Include="Automapping\IAutomappingConfiguration.cs" />
     <Compile Include="Automapping\InlineOverride.cs" />
     <Compile Include="Automapping\IPropertyIgnorer.cs" />
     <Compile Include="CombinedAssemblyTypeSource.cs" />

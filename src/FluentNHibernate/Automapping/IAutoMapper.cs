@@ -6,7 +6,7 @@ namespace FluentNHibernate.Automapping
 {
     public interface IAutoMapper
     {
-        bool MapsProperty(Member property);
+        bool ShouldMap(Member member);
         void Map(ClassMappingBase classMap, Member property);
     }
 }

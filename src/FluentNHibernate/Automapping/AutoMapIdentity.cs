@@ -9,16 +9,16 @@ namespace FluentNHibernate.Automapping
 {
     public class AutoMapIdentity : IAutoMapper
     {
-        private readonly AutoMappingExpressions expressions;
+        private readonly IAutomappingConfiguration cfg;
 
-        public AutoMapIdentity(AutoMappingExpressions conventions)
+        public AutoMapIdentity(IAutomappingConfiguration cfg)
         {
-            this.expressions = conventions;
+            this.cfg = cfg;
         }
 
-        public bool MapsProperty(Member property)
+        public bool ShouldMap(Member member)
         {
-            return expressions.FindIdentity(property);
+            return cfg.IsId(member);
         }
 
         public void Map(ClassMappingBase classMap, Member property)

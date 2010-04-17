@@ -14,21 +14,21 @@ namespace FluentNHibernate.Automapping
     public class AutoMapProperty : IAutoMapper
     {
         private readonly IConventionFinder conventionFinder;
-        private readonly AutoMappingExpressions expressions;
+        private readonly IAutomappingConfiguration cfg;
 
-        public AutoMapProperty(IConventionFinder conventionFinder, AutoMappingExpressions expressions)
+        public AutoMapProperty(IConventionFinder conventionFinder, IAutomappingConfiguration cfg)
         {
             this.conventionFinder = conventionFinder;
-            this.expressions = expressions;
+            this.cfg = cfg;
         }
 
-        public bool MapsProperty(Member property)
+        public bool ShouldMap(Member member)
         {
-            if (HasExplicitTypeConvention(property))
+            if (HasExplicitTypeConvention(member))
                 return true;
 
-            if (property.CanWrite)
-                return IsMappableToColumnType(property);
+            if (member.CanWrite)
+                return IsMappableToColumnType(member);
 
             return false;
         }
@@ -87,7 +87,7 @@ namespace FluentNHibernate.Automapping
             var columnName = property.Name;
             
             if (component != null)
-                columnName = expressions.GetComponentColumnPrefix(component.Member) + columnName;
+                columnName = cfg.GetComponentColumnPrefix(component.Member) + columnName;
 
             mapping.AddDefaultColumn(new ColumnMapping { Name = columnName });
 

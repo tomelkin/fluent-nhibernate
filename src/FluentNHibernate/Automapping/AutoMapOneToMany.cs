@@ -7,16 +7,16 @@ namespace FluentNHibernate.Automapping
         readonly AutoSimpleTypeCollection simpleTypeCollectionStep;
         readonly AutoEntityCollection entityCollectionStep;
 
-        public AutoMapOneToMany(AutoMappingExpressions expressions)
+        public AutoMapOneToMany(IAutomappingConfiguration cfg)
         {
-            simpleTypeCollectionStep = new AutoSimpleTypeCollection(expressions);
-            entityCollectionStep = new AutoEntityCollection(expressions);
+            simpleTypeCollectionStep = new AutoSimpleTypeCollection(cfg);
+            entityCollectionStep = new AutoEntityCollection(cfg);
         }
 
-        public bool MapsProperty(Member property)
+        public bool ShouldMap(Member member)
         {
-            return simpleTypeCollectionStep.MapsProperty(property) ||
-                   entityCollectionStep.MapsProperty(property);
+            return simpleTypeCollectionStep.ShouldMap(member) ||
+                   entityCollectionStep.ShouldMap(member);
         }
 
         public void Map(ClassMappingBase classMap, Member property)
@@ -24,9 +24,9 @@ namespace FluentNHibernate.Automapping
             if (property.DeclaringType != classMap.Type)
                 return;
 
-            if (simpleTypeCollectionStep.MapsProperty(property))
+            if (simpleTypeCollectionStep.ShouldMap(property))
                 simpleTypeCollectionStep.Map(classMap, property);
-            else if (entityCollectionStep.MapsProperty(property))
+            else if (entityCollectionStep.ShouldMap(property))
                 entityCollectionStep.Map(classMap, property);
         }
     }

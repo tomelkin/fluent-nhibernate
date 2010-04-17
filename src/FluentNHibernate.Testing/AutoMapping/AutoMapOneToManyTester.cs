@@ -18,7 +18,7 @@ namespace FluentNHibernate.Testing.Automapping
         [SetUp]
         public void CreateMapper()
         {
-            mapper = new AutoMapOneToMany(new AutoMappingExpressions());
+            mapper = new AutoMapOneToMany(new DefaultAutomappingConfiguration());
         }
 
         [Test]
@@ -91,12 +91,12 @@ namespace FluentNHibernate.Testing.Automapping
 
         protected void ShouldMap(Expression<System.Func<PropertyTarget, object>> property)
         {
-            mapper.MapsProperty(ReflectionHelper.GetMember(property)).ShouldBeTrue();
+            mapper.ShouldMap(ReflectionHelper.GetMember(property)).ShouldBeTrue();
         }
 
         protected void ShouldntMap(Expression<System.Func<PropertyTarget, object>> property)
         {
-            mapper.MapsProperty(ReflectionHelper.GetMember(property)).ShouldBeFalse();
+            mapper.ShouldMap(ReflectionHelper.GetMember(property)).ShouldBeFalse();
         }
 
         protected class PropertyTarget

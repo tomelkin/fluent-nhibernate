@@ -17,7 +17,7 @@ namespace FluentNHibernate.Testing.Automapping
             var Member = ReflectionHelper.GetMember<ManyToMany1>(x => x.Many1);
             var autoMap = new ClassMapping();
 
-            var mapper = new AutoMapManyToMany(new AutoMappingExpressions());
+            var mapper = new AutoMapManyToMany(new DefaultAutomappingConfiguration());
             mapper.Map(autoMap, Member);
 
             autoMap.Collections.ShouldHaveCount(1);

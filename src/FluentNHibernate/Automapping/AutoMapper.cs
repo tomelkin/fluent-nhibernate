@@ -12,23 +12,23 @@ namespace FluentNHibernate.Automapping
     {
         private readonly List<IAutoMapper> mappingRules;
         private List<AutoMapType> mappingTypes;
-        private readonly AutoMappingExpressions expressions;
+        readonly IAutomappingConfiguration cfg;
         private readonly IEnumerable<InlineOverride> inlineOverrides;
 
-        public AutoMapper(AutoMappingExpressions expressions, IConventionFinder conventionFinder, IEnumerable<InlineOverride> inlineOverrides)
+        public AutoMapper(IAutomappingConfiguration cfg, IConventionFinder conventionFinder, IEnumerable<InlineOverride> inlineOverrides)
         {
-            this.expressions = expressions;
+            this.cfg = cfg;
             this.inlineOverrides = inlineOverrides;
 
             mappingRules = new List<IAutoMapper>
             {
-                new AutoMapIdentity(expressions), 
+                new AutoMapIdentity(cfg), 
                 new AutoMapVersion(), 
-                new AutoMapComponent(expressions, this),
-                new AutoMapProperty(conventionFinder, expressions),
-                new AutoMapManyToMany(expressions),
+                new AutoMapComponent(cfg, this),
+                new AutoMapProperty(conventionFinder, cfg),
+                new AutoMapManyToMany(cfg),
                 new AutoMapManyToOne(),
-                new AutoMapOneToMany(expressions),
+                new AutoMapOneToMany(cfg),
             };
         }
 
@@ -61,15 +61,15 @@ namespace FluentNHibernate.Automapping
         private void MapInheritanceTree(Type classType, ClassMappingBase mapping, IList<Member> mappedMembers)
         {
             var discriminatorSet = false;
-            var isDiscriminated = expressions.IsDiscriminated(classType);
+            var isDiscriminated = cfg.IsDiscriminated(classType);
 
             foreach (var inheritedClass in mappingTypes.Where(q =>
                 q.Type.BaseType == classType &&
-                    !expressions.IsConcreteBaseType(q.Type.BaseType)))
+                    !cfg.IsConcreteBaseType(q.Type.BaseType)))
             {
                 if (isDiscriminated && !discriminatorSet && mapping is ClassMapping)
                 {
-                    var discriminatorColumn = expressions.DiscriminatorColumn(classType);
+                    var discriminatorColumn = cfg.GetDiscriminatorColumn(classType);
                     var discriminator = new DiscriminatorMapping
                     {
                         ContainingEntityType = classType,
@@ -82,7 +82,7 @@ namespace FluentNHibernate.Automapping
                 }
 
                 SubclassMapping subclassMapping;
-                var subclassStrategy = expressions.SubclassStrategy(classType);
+                var subclassStrategy = cfg.GetSubclassStrategy(classType);
 
                 if (subclassStrategy == SubclassStrategy.JoinedSubclass)
                 {
@@ -115,7 +115,7 @@ namespace FluentNHibernate.Automapping
         public virtual void ProcessClass(ClassMappingBase mapping, Type entityType, IList<Member> mappedMembers)
         {
             entityType.GetInstanceMembers()
-                .Where(expressions.FindMembers)
+                .Where(cfg.ShouldMap)
                 .Each(x => TryMapProperty(mapping, x, mappedMembers));
         }
 
@@ -125,7 +125,7 @@ namespace FluentNHibernate.Automapping
 
             foreach (var rule in mappingRules)
             {
-                if (!rule.MapsProperty(member)) continue;
+                if (!rule.ShouldMap(member)) continue;
                 if (mappedMembers.Contains(member)) continue;
 
                 rule.Map(mapping, member);

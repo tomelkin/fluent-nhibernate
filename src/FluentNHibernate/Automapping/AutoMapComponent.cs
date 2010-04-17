@@ -7,18 +7,18 @@ namespace FluentNHibernate.Automapping
 {
     public class AutoMapComponent : IAutoMapper
     {
-        private readonly AutoMappingExpressions expressions;
+        private readonly IAutomappingConfiguration cfg;
         private readonly AutoMapper mapper;
 
-        public AutoMapComponent(AutoMappingExpressions expressions, AutoMapper mapper)
+        public AutoMapComponent(IAutomappingConfiguration cfg, AutoMapper mapper)
         {
-            this.expressions = expressions;
+            this.cfg = cfg;
             this.mapper = mapper;
         }
 
-        public bool MapsProperty(Member property)
+        public bool ShouldMap(Member member)
         {
-            return expressions.IsComponentType(property.PropertyType);
+            return cfg.IsComponent(member.PropertyType);
         }
 
         public void Map(ClassMappingBase classMap, Member property)

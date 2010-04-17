@@ -11,6 +11,8 @@ namespace FluentNHibernate.Automapping
 {
     public class AutoPersistenceModel : PersistenceModel
     {
+        readonly IAutomappingConfiguration cfg;
+        readonly AutoMappingExpressions expressions;
         protected AutoMapper autoMapper;
         private readonly List<ITypeSource> sources = new List<ITypeSource>();
         private Func<Type, bool> shouldIncludeType;
@@ -23,14 +25,15 @@ namespace FluentNHibernate.Automapping
 
         public AutoPersistenceModel()
         {
-            Expressions = new AutoMappingExpressions();
-            autoMapper = new AutoMapper(Expressions, Conventions, inlineOverrides);
+            expressions = new AutoMappingExpressions();
+            cfg = new ExpressionBasedAutomappingConfiguration(expressions);
+            autoMapper = new AutoMapper(cfg, Conventions, inlineOverrides);
         }
 
-        public AutoPersistenceModel(AutoMapper customAutomapper)
+        public AutoPersistenceModel(IAutomappingConfiguration cfg)
         {
-            Expressions = new AutoMappingExpressions();
-            autoMapper = customAutomapper;
+            this.cfg = cfg;
+            autoMapper = new AutoMapper(cfg, Conventions, inlineOverrides);
         }
 
         /// <summary>
@@ -78,11 +81,12 @@ namespace FluentNHibernate.Automapping
         /// </summary>
         public AutoPersistenceModel Setup(Action<AutoMappingExpressions> expressionsAction)
         {
-            expressionsAction(Expressions);
+            if (!(cfg is ExpressionBasedAutomappingConfiguration))
+                throw new InvalidOperationException("Cannot use Setup method when using a user-defined IAutomappingConfiguration instance.");
+
+            expressionsAction(expressions);
             return this;
         }
-
-        internal AutoMappingExpressions Expressions { get; private set; }
 
         public AutoPersistenceModel Where(Func<Type, bool> where)
         {
@@ -169,7 +173,7 @@ namespace FluentNHibernate.Automapping
 
         private bool ShouldMapParent(Type type)
         {
-            return ShouldMap(type.BaseType) && !Expressions.IsConcreteBaseType(type.BaseType);
+            return ShouldMap(type.BaseType) && !cfg.IsConcreteBaseType(type.BaseType);
         }
 
         private bool ShouldMap(Type type)
@@ -180,12 +184,8 @@ namespace FluentNHibernate.Automapping
                 return false; // excluded
             if (type.IsGenericType && ignoredTypes.Contains(type.GetGenericTypeDefinition()))
                 return false; // generic definition is excluded
-            if (type.IsAbstract && Expressions.AbstractClassIsLayerSupertype(type))
+            if (type.IsAbstract && cfg.AbstractClassIsLayerSupertype(type))
                 return false; // is abstract and a layer supertype
-#pragma warning disable 618,612
-            if (Expressions.IsBaseType(type))
-#pragma warning restore 618,612
-                return false; // excluded
             if (type == typeof(object))
                 return false; // object!
 
@@ -232,7 +232,7 @@ namespace FluentNHibernate.Automapping
             // if we haven't found a map yet then try to find a map of the
             // base type to merge if not a concrete base type
 
-			if (type.BaseType != typeof(object) && !Expressions.IsConcreteBaseType(type.BaseType))
+			if (type.BaseType != typeof(object) && !cfg.IsConcreteBaseType(type.BaseType))
 			{
 				return FindMapping(type.BaseType);
 			}
@@ -325,7 +325,7 @@ namespace FluentNHibernate.Automapping
         /// Abstract classes are probably what you'll be using this method with. Fluent NHibernate considers abstract
         /// classes to be layer supertypes, so doesn't automatically map them as part of an inheritance hierarchy. You
         /// can use this method to override that behavior for a specific type; otherwise you should consider using the
-        /// <see cref="AutoMappingExpressions.AbstractClassIsLayerSupertype"/> setting.
+        /// <see cref="IAutomappingConfiguration.AbstractClassIsLayerSupertype"/> setting.
         /// </remarks>
         /// <typeparam name="T">Type to include</typeparam>
         public AutoPersistenceModel IncludeBase<T>()

@@ -21,7 +21,7 @@ namespace FluentNHibernate.Testing.Automapping
         [Test]
         public void ShouldMapByteArray()
         {
-            mapper.MapsProperty(typeof(Target).GetProperty("Version").ToMember()).ShouldBeTrue();
+            mapper.ShouldMap(typeof(Target).GetProperty("Version").ToMember()).ShouldBeTrue();
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace FluentNHibernate.Testing.Automapping
         [Test]
         public void ShouldMapByteArray()
         {
-            mapper.MapsProperty(ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version)).ShouldBeTrue();
+            mapper.ShouldMap(ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version)).ShouldBeTrue();
         }
 
         [Test]

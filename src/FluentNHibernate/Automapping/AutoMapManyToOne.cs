@@ -14,10 +14,10 @@ namespace FluentNHibernate.Automapping
             p.PropertyType.Namespace != "Iesi.Collections.Generic" &&
 	    !p.PropertyType.IsEnum);
 
-        public bool MapsProperty(Member property)
+        public bool ShouldMap(Member member)
         {
-            if (property.CanWrite)
-                return findPropertyconvention(property);
+            if (member.CanWrite)
+                return findPropertyconvention(member);
 
             return false;
         }
