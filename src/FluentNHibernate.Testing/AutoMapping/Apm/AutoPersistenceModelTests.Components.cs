@@ -3,6 +3,7 @@ using FluentNHibernate.Automapping;
 using FluentNHibernate.Automapping.TestFixtures;
 using FluentNHibernate.Automapping.TestFixtures.ComponentTypes;
 using FluentNHibernate.Automapping.TestFixtures.CustomTypes;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Testing.Automapping;
 using NUnit.Framework;
 
@@ -24,8 +25,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Apm
         [Test]
         public void ComponentTypesAutoMapped()
         {
-            var autoMapper = AutoMap.Source(source, addressCfg)
-                .Conventions.Add<CustomTypeConvention>();
+            var autoMapper = AutoMap.Source(source, addressCfg);
 
             new AutoMappingTester<Customer>(autoMapper)
                 .Element("class/component[@name='HomeAddress']").Exists()
@@ -35,8 +35,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Apm
         [Test]
         public void ComponentPropertiesAutoMapped()
         {
-            var autoMapper = AutoMap.Source(source, addressCfg)
-                .Conventions.Add<CustomTypeConvention>();
+            var autoMapper = AutoMap.Source(source, addressCfg);
 
             new AutoMappingTester<Customer>(autoMapper)
                 .Element("class/component/property[@name='Number']").Exists()
@@ -105,8 +104,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Apm
         [Test]
         public void ComponentPropertiesWithUserTypeAutoMapped()
         {
-            var autoMapper = AutoMap.Source(source, addressCfg)
-                .Conventions.Add<CustomTypeConvention>();
+            var autoMapper = AutoMap.Source(source, addressCfg);
 
             new AutoMappingTester<Customer>(autoMapper)
                 .Element("class/component/property[@name='Custom']").HasAttribute("type", typeof(CustomUserType).AssemblyQualifiedName);
@@ -115,8 +113,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Apm
         [Test]
         public void ComponentPropertiesAssumeComponentColumnPrefix()
         {
-            var autoMapper = AutoMap.Source(source, addressCfg)
-                .Conventions.Add<CustomTypeConvention>();
+            var autoMapper = AutoMap.Source(source, addressCfg);
 
             new AutoMappingTester<Customer>(autoMapper)
                 .Element("class/component[@name='WorkAddress']/property[@name='Number']/column").HasAttribute("name", "WorkAddress_Number");
@@ -125,8 +122,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Apm
         [Test]
         public void ComponentColumnConventionReceivesProperty()
         {
-            var autoMapper = AutoMap.Source(source, addressCfg)
-                .Conventions.Add<CustomTypeConvention>();
+            var autoMapper = AutoMap.Source(source, addressCfg);
 
             new AutoMappingTester<Customer>(autoMapper)
                 .Element("class/component[@name='WorkAddress']/property[@name='Number']/column")
@@ -157,6 +153,11 @@ namespace FluentNHibernate.Testing.AutoMapping.Apm
             public override string GetComponentColumnPrefix(Member member)
             {
                 return member.Name + "_";
+            }
+
+            public override void GetConventions(IConventionContainer container)
+            {
+                container.Add<CustomTypeConvention>();
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using FluentNHibernate.Automapping.Alterations;
 using FluentNHibernate.Cfg;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel;
 
@@ -27,13 +28,27 @@ namespace FluentNHibernate.Automapping
         {
             expressions = new AutoMappingExpressions();
             cfg = new ExpressionBasedAutomappingConfiguration(expressions);
-            autoMapper = new AutoMapper(cfg, Conventions, inlineOverrides);
+            autoMapper = new AutoMapper(cfg, new ConventionFinder(conventions), inlineOverrides);
         }
 
         public AutoPersistenceModel(IAutomappingConfiguration cfg)
         {
             this.cfg = cfg;
-            autoMapper = new AutoMapper(cfg, Conventions, inlineOverrides);
+            autoMapper = new AutoMapper(cfg, new ConfigurationBasedFinder(conventions, cfg), inlineOverrides);
+        }
+
+        /// <summary>
+        /// Alter convention discovery
+        /// </summary>
+        public new SetupConventionContainer<AutoPersistenceModel> Conventions
+        {
+            get
+            {
+                if (HasUserDefinedConfiguration)
+                    throw new InvalidOperationException("Cannot use Conventions property when using a user-defined IAutomappingConfiguration instance.");
+
+                return new SetupConventionContainer<AutoPersistenceModel>(this, base.Conventions);
+            }
         }
 
         /// <summary>
@@ -66,14 +81,6 @@ namespace FluentNHibernate.Automapping
         {
             alterations.Add(new AutoMappingOverrideAlteration(assembly));
             return this;
-        }
-
-        /// <summary>
-        /// Alter convention discovery
-        /// </summary>
-        public new SetupConventionFinder<AutoPersistenceModel> Conventions
-        {
-            get { return new SetupConventionFinder<AutoPersistenceModel>(this, base.Conventions); }
         }
 
         /// <summary>
@@ -367,5 +374,32 @@ namespace FluentNHibernate.Automapping
         {
             get { return !(cfg is ExpressionBasedAutomappingConfiguration); }
         }
+
+        class ConfigurationBasedFinder : IConventionFinder
+        {
+            readonly IAutomappingConfiguration cfg;
+            readonly ConventionsCollection conventions;
+            readonly ConventionFinder finder;
+            bool fetched;
+
+            public ConfigurationBasedFinder(ConventionsCollection conventions, IAutomappingConfiguration cfg)
+            {
+                this.cfg = cfg;
+                this.conventions = conventions;
+                finder = new ConventionFinder(conventions);
+            }
+
+            public IEnumerable<T> Find<T>() where T : IConvention
+            {
+                if (!fetched)
+                {
+                    cfg.GetConventions(new ConventionContainer(conventions));
+                    fetched = true;
+                }
+
+                return finder.Find<T>();
+            }
+        }
+
     }
 }

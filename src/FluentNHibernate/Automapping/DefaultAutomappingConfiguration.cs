@@ -80,5 +80,10 @@ namespace FluentNHibernate.Automapping
                 new HasManyStep(this)
             };
         }
+
+        public virtual void GetConventions(IConventionContainer container)
+        {
+            
+        }
     }
 }

@@ -12,20 +12,22 @@ namespace FluentNHibernate.Testing.ConventionsTests
     [TestFixture]
     public class OptionalAcceptTests
     {
-        private DefaultConventionFinder conventions;
+        private ConventionContainer container;
         private ConventionVisitor visitor;
 
         [SetUp]
         public void CreateVisitor()
         {
-            conventions = new DefaultConventionFinder();
-            visitor = new ConventionVisitor(conventions);
+            var conventions = new ConventionsCollection();
+
+            container = new ConventionContainer(conventions);
+            visitor = new ConventionVisitor(new ConventionFinder(conventions));
         }
 
         [Test]
         public void ShouldNotApplyConventionWithFailingAccept()
         {
-            conventions.Add<ConventionWithFailingAccept>();
+            container.Add<ConventionWithFailingAccept>();
 
             var mapping = new ClassMapping();
             
@@ -37,7 +39,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
         [Test]
         public void ShouldApplyConventionWithSuccessfulAccept()
         {
-            conventions.Add<ConventionWithSuccessfulAccept>();
+            container.Add<ConventionWithSuccessfulAccept>();
 
             var mapping = new ClassMapping();
 
@@ -49,7 +51,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
         [Test]
         public void ShouldApplyConventionWithNoAccept()
         {
-            conventions.Add<ConventionWithNoAccept>();
+            container.Add<ConventionWithNoAccept>();
 
             var mapping = new ClassMapping();
 

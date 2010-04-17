@@ -5,73 +5,73 @@ using FluentNHibernate.Conventions;
 
 namespace FluentNHibernate.Cfg
 {
-    public class SetupConventionFinder<TReturn> : IConventionFinder
+    public class SetupConventionContainer<TReturn> : IConventionContainer
     {
         private readonly TReturn parent;
-        private readonly IConventionFinder conventionFinder;
+        private readonly IConventionContainer container;
 
-        public SetupConventionFinder(TReturn container, IConventionFinder conventionFinder)
+        public SetupConventionContainer(TReturn parent, IConventionContainer container)
         {
-            parent = container;
-            this.conventionFinder = conventionFinder;
+            this.parent = parent;
+            this.container = container;
         }
 
         public TReturn AddAssembly(Assembly assembly)
         {
-            conventionFinder.AddAssembly(assembly);
+            container.AddAssembly(assembly);
             return parent;
         }
 
         public TReturn AddFromAssemblyOf<T>()
         {
-            conventionFinder.AddFromAssemblyOf<T>();
+            container.AddFromAssemblyOf<T>();
             return parent;
         }
 
-        void IConventionFinder.AddFromAssemblyOf<T>()
+        void IConventionContainer.AddFromAssemblyOf<T>()
         {
             AddFromAssemblyOf<T>();
         }
 
-        void IConventionFinder.AddAssembly(Assembly assembly)
+        void IConventionContainer.AddAssembly(Assembly assembly)
         {
             AddAssembly(assembly);
         }
 
         public TReturn Add<T>() where T : IConvention
         {
-            conventionFinder.Add<T>();
+            container.Add<T>();
             return parent;
         }
 
-        void IConventionFinder.Add<T>()
+        void IConventionContainer.Add<T>()
         {
             Add<T>();
         }
 
         public void Add(Type type, object instance)
         {
-            conventionFinder.Add(type, instance);
+            container.Add(type, instance);
         }
 
         public TReturn Add<T>(T instance) where T : IConvention
         {
-            conventionFinder.Add(instance);
+            container.Add(instance);
             return parent;
         }
 
-        void IConventionFinder.Add(Type type)
+        void IConventionContainer.Add(Type type)
         {
             Add(type);
         }
 
         public TReturn Add(Type type)
         {
-            conventionFinder.Add(type);
+            container.Add(type);
             return parent;
         }
 
-        void IConventionFinder.Add<T>(T instance)
+        void IConventionContainer.Add<T>(T instance)
         {
             Add(instance);
         }
@@ -80,21 +80,16 @@ namespace FluentNHibernate.Cfg
         {
             foreach (var instance in instances)
             {
-                conventionFinder.Add(instance.GetType(), instance);
+                container.Add(instance.GetType(), instance);
             }
 
             return parent;
         }
 
-        public TReturn Setup(Action<IConventionFinder> setupAction)
+        public TReturn Setup(Action<IConventionContainer> setupAction)
         {
             setupAction(this);
             return parent;
-        }
-
-        public IEnumerable<T> Find<T>() where T : IConvention
-        {
-            return conventionFinder.Find<T>();
         }
     }
 }

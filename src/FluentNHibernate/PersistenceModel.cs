@@ -26,29 +26,29 @@ namespace FluentNHibernate
         protected readonly IList<IIndeterminateSubclassMappingProvider> subclassProviders = new List<IIndeterminateSubclassMappingProvider>();
         protected readonly IList<IExternalComponentMappingProvider> componentProviders = new List<IExternalComponentMappingProvider>();
         private readonly IList<IMappingModelVisitor> visitors = new List<IMappingModelVisitor>();
-        public IConventionFinder Conventions { get; private set; }
         public bool MergeMappings { get; set; }
         private IEnumerable<HibernateMapping> compiledMappings;
         private ValidationVisitor validationVisitor;
+        protected readonly ConventionsCollection conventions = new ConventionsCollection();
         public PairBiDirectionalManyToManySidesDelegate BiDirectionalManyToManyPairer { get; set; }
 
-        public PersistenceModel(IConventionFinder conventionFinder)
+        public PersistenceModel()
         {
             BiDirectionalManyToManyPairer = (c,o,w) => {};
-            Conventions = conventionFinder;
 
             visitors.Add(new SeparateSubclassVisitor(subclassProviders));
             visitors.Add(new ComponentReferenceResolutionVisitor(componentProviders));
             visitors.Add(new ComponentColumnPrefixVisitor());
             visitors.Add(new BiDirectionalManyToManyPairingVisitor(BiDirectionalManyToManyPairer));
             visitors.Add(new ManyToManyTableNameVisitor());
-            visitors.Add(new ConventionVisitor(Conventions));
+            visitors.Add(new ConventionVisitor(new ConventionFinder(conventions)));
             visitors.Add((validationVisitor = new ValidationVisitor()));
         }
 
-        public PersistenceModel()
-            : this(new DefaultConventionFinder())
-        {}
+        public IConventionContainer Conventions
+        {
+            get { return new ConventionContainer(conventions); }
+        }
 
         protected void AddMappingsFromThisAssembly()
         {

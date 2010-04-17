@@ -94,8 +94,7 @@ namespace Examples.FirstAutomappedProject
             // all the classes in the assembly that contains Employee), and then either
             // use the Setup and Where methods to restrict that behaviour, or (preferably)
             // supply a configuration instance of your definition to control the automapper.
-            return AutoMap.AssemblyOf<Employee>(new ExampleAutomappingConfiguration())
-                .Conventions.Add<CascadeConvention>();
+            return AutoMap.AssemblyOf<Employee>(new ExampleAutomappingConfiguration());
         }
 
         /// <summary>

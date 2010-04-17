@@ -1,9 +1,5 @@
-using System;
 using FluentNHibernate.Conventions;
-using FluentNHibernate.Conventions.AcceptanceCriteria;
 using FluentNHibernate.Conventions.Instances;
-using FluentNHibernate.Conventions.Inspections;
-using FluentNHibernate.Mapping;
 using NUnit.Framework;
 
 namespace FluentNHibernate.Testing.ConventionFinderTests
@@ -11,18 +7,18 @@ namespace FluentNHibernate.Testing.ConventionFinderTests
     [TestFixture]
     public class AddingTypeTests
     {
-        private DefaultConventionFinder finder;
+        private ConventionContainer container;
 
         [SetUp]
         public void CreateFinder()
         {
-            finder = new DefaultConventionFinder();
+            container = new ConventionContainer(new ConventionsCollection());
         }
 
         [Test]
         public void AddingSingleShouldntThrowIfHasParameterlessConstructor()
         {
-            var ex = Catch.Exception(() => finder.Add<ConventionWithParameterlessConstructor>());
+            var ex = Catch.Exception(() => container.Add<ConventionWithParameterlessConstructor>());
 
             ex.ShouldBeNull();
         }
@@ -30,7 +26,7 @@ namespace FluentNHibernate.Testing.ConventionFinderTests
         [Test]
         public void AddingSingleShouldntThrowIfHasIConventionFinderConstructor()
         {
-            var ex = Catch.Exception(() => finder.Add<ConventionWithIConventionFinderConstructor>());
+            var ex = Catch.Exception(() => container.Add<ConventionWithIConventionFinderConstructor>());
 
             ex.ShouldBeNull();
         }
@@ -38,7 +34,7 @@ namespace FluentNHibernate.Testing.ConventionFinderTests
         [Test]
         public void AddingSingleShouldThrowIfNoParameterlessConstructor()
         {
-            var ex = Catch.Exception(() => finder.Add<ConventionWithoutValidConstructor>());
+            var ex = Catch.Exception(() => container.Add<ConventionWithoutValidConstructor>());
 
             ex.ShouldBeOfType<MissingConstructorException>();
             ex.ShouldNotBeNull();
@@ -47,7 +43,7 @@ namespace FluentNHibernate.Testing.ConventionFinderTests
         [Test]
         public void AddingSingleShouldThrowIfNoIConventionFinderConstructor()
         {
-            var ex = Catch.Exception(() => finder.Add<ConventionWithoutValidConstructor>());
+            var ex = Catch.Exception(() => container.Add<ConventionWithoutValidConstructor>());
 
             ex.ShouldBeOfType<MissingConstructorException>();
             ex.ShouldNotBeNull();
@@ -56,7 +52,7 @@ namespace FluentNHibernate.Testing.ConventionFinderTests
         [Test]
         public void AddingAssemblyShouldntThrowIfNoIConventionFinderConstructor()
         {
-            var ex = Catch.Exception(() => finder.AddAssembly(typeof(ConventionWithoutValidConstructor).Assembly));
+            var ex = Catch.Exception(() => container.AddAssembly(typeof(ConventionWithoutValidConstructor).Assembly));
 
             ex.ShouldBeNull();
         }

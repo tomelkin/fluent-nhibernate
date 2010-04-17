@@ -1,6 +1,7 @@
 ﻿using System;
 using Examples.FirstAutomappedProject.Entities;
 using FluentNHibernate.Automapping;
+using FluentNHibernate.Conventions;
 
 namespace Examples.FirstAutomappedProject
 {
@@ -24,6 +25,14 @@ namespace Examples.FirstAutomappedProject
             // if you have a large list of types, you should consider maintaining a list of them
             // somewhere or using some form of conventional and/or attribute design
             return type == typeof(Location);
+        }
+
+        public override void GetConventions(IConventionContainer container)
+        {
+            // override this method to specify which conventions are used. You can
+            // add entire assemblies, but in this case we're just using a single
+            // convention.
+            container.Add<CascadeConvention>();
         }
     }
 }
