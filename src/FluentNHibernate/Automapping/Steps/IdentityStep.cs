@@ -1,17 +1,16 @@
-using System;
-using System.Reflection;
+﻿using System;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Identity;
 
-namespace FluentNHibernate.Automapping
+namespace FluentNHibernate.Automapping.Steps
 {
-    public class AutoMapIdentity : IAutoMapper
+    public class IdentityStep : IAutomappingStep
     {
         private readonly IAutomappingConfiguration cfg;
 
-        public AutoMapIdentity(IAutomappingConfiguration cfg)
+        public IdentityStep(IAutomappingConfiguration cfg)
         {
             this.cfg = cfg;
         }

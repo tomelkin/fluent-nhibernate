@@ -1,16 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using FluentNHibernate.MappingModel.ClassBased;
 
-namespace FluentNHibernate.Automapping
+namespace FluentNHibernate.Automapping.Steps
 {
-    public class AutoMapComponent : IAutoMapper
+    public class ComponentStep : IAutomappingStep
     {
         private readonly IAutomappingConfiguration cfg;
         private readonly AutoMapper mapper;
 
-        public AutoMapComponent(IAutomappingConfiguration cfg, AutoMapper mapper)
+        public ComponentStep(IAutomappingConfiguration cfg, AutoMapper mapper)
         {
             this.cfg = cfg;
             this.mapper = mapper;

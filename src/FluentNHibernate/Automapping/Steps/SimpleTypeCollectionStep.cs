@@ -1,19 +1,19 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
 using FluentNHibernate.Utils;
 
-namespace FluentNHibernate.Automapping
+namespace FluentNHibernate.Automapping.Steps
 {
-    public class AutoSimpleTypeCollection : IAutoMapper
+    public class SimpleTypeCollectionStep : IAutomappingStep
     {
         readonly IAutomappingConfiguration cfg;
         readonly AutoKeyMapper keys;
         readonly AutoCollectionCreator collections;
 
-        public AutoSimpleTypeCollection(IAutomappingConfiguration cfg)
+        public SimpleTypeCollectionStep(IAutomappingConfiguration cfg)
         {
             this.cfg = cfg;
             keys = new AutoKeyMapper(cfg);

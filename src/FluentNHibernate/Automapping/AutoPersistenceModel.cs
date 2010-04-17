@@ -13,15 +13,15 @@ namespace FluentNHibernate.Automapping
     {
         readonly IAutomappingConfiguration cfg;
         readonly AutoMappingExpressions expressions;
-        protected AutoMapper autoMapper;
-        private readonly List<ITypeSource> sources = new List<ITypeSource>();
-        private Func<Type, bool> shouldIncludeType;
-        private readonly List<AutoMapType> mappingTypes = new List<AutoMapType>();
-        private bool autoMappingsCreated;
-        private readonly AutoMappingAlterationCollection alterations = new AutoMappingAlterationCollection();
-        protected readonly List<InlineOverride> inlineOverrides = new List<InlineOverride>();
-        private readonly List<Type> ignoredTypes = new List<Type>();
-        private readonly List<Type> includedTypes = new List<Type>();
+        readonly AutoMapper autoMapper;
+        readonly List<ITypeSource> sources = new List<ITypeSource>();
+        Func<Type, bool> whereClause;
+        readonly List<AutoMapType> mappingTypes = new List<AutoMapType>();
+        bool autoMappingsCreated;
+        readonly AutoMappingAlterationCollection alterations = new AutoMappingAlterationCollection();
+        readonly List<InlineOverride> inlineOverrides = new List<InlineOverride>();
+        readonly List<Type> ignoredTypes = new List<Type>();
+        readonly List<Type> includedTypes = new List<Type>();
 
         public AutoPersistenceModel()
         {
@@ -77,20 +77,31 @@ namespace FluentNHibernate.Automapping
         }
 
         /// <summary>
-        /// Alter some of the configuration options that control how the automapper works
+        /// Alter some of the configuration options that control how the automapper works.
+        /// Depreciated in favour of supplying your own IAutomappingConfiguration instance to AutoMap: <see cref="AutoMap.AssemblyOf{T}(FluentNHibernate.Automapping.IAutomappingConfiguration)"/>.
+        /// Cannot be used in combination with a user-defined configuration.
         /// </summary>
+        [Obsolete("Depreciated in favour of supplying your own IAutomappingConfiguration instance to AutoMap: AutoMap.AssemblyOf<T>(your_configuration_instance)")]
         public AutoPersistenceModel Setup(Action<AutoMappingExpressions> expressionsAction)
         {
-            if (!(cfg is ExpressionBasedAutomappingConfiguration))
+            if (HasUserDefinedConfiguration)
                 throw new InvalidOperationException("Cannot use Setup method when using a user-defined IAutomappingConfiguration instance.");
 
             expressionsAction(expressions);
             return this;
         }
 
+        /// <summary>
+        /// Supply a criteria for which types will be mapped.
+        /// Cannot be used in combination with a user-defined configuration.
+        /// </summary>
+        /// <param name="where">Where clause</param>
         public AutoPersistenceModel Where(Func<Type, bool> where)
         {
-            this.shouldIncludeType = where;
+            if (HasUserDefinedConfiguration)
+                throw new InvalidOperationException("Cannot use Where method when using a user-defined IAutomappingConfiguration instance.");
+
+            whereClause = where;
             return this;
         }
 
@@ -110,12 +121,13 @@ namespace FluentNHibernate.Automapping
 
             foreach (var type in sources.SelectMany(x => x.GetTypes()))
             {
-                if (shouldIncludeType != null)
-                {
-                    if (!shouldIncludeType(type))
-                        continue;
-                }
-
+                // skipped by user-defined configuration criteria
+                if (HasUserDefinedConfiguration && !cfg.ShouldMap(type))
+                    continue;
+                // skipped by inline where clause
+                if (whereClause != null && !whereClause(type))
+                    continue;
+                // skipped because either already mapped elsewhere, or not valid for mapping            
                 if (!ShouldMap(type))
                     continue;
 
@@ -124,18 +136,15 @@ namespace FluentNHibernate.Automapping
 
             foreach (var type in mappingTypes)
             {
-                if (type.Type.IsClass && IsNotInnerClass(type))
-                {
-                    if (!type.IsMapped)
-                    {
-                        var mapping = FindMapping(type.Type);
+                if (!type.Type.IsClass || !IsNotInnerClass(type)) continue;
+                if (type.IsMapped) continue;
 
-                        if (mapping != null)
-                            MergeMap(type.Type, mapping);
-                        else
-                            AddMapping(type.Type);
-                    }
-                }
+                var mapping = FindMapping(type.Type);
+
+                if (mapping == null)
+                    AddMapping(type.Type);
+                else
+                    MergeMap(type.Type, mapping);
             }
 
             autoMappingsCreated = true;
@@ -148,7 +157,7 @@ namespace FluentNHibernate.Automapping
             base.Configure(configuration);
         }
 
-        private static bool IsNotInnerClass(AutoMapType type)
+        static bool IsNotInnerClass(AutoMapType type)
         {
             return type.Type.ReflectedType == null;
         }
@@ -352,6 +361,11 @@ namespace FluentNHibernate.Automapping
         protected override string GetMappingFileName()
         {
             return "AutoMappings.hbm.xml";
+        }
+
+        bool HasUserDefinedConfiguration
+        {
+            get { return !(cfg is ExpressionBasedAutomappingConfiguration); }
         }
     }
 }

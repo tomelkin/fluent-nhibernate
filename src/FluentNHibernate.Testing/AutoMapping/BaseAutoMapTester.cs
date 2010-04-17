@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using FluentNHibernate.Automapping;
+using FluentNHibernate.Automapping.Steps;
 using FluentNHibernate.Utils.Reflection;
 using Iesi.Collections.Generic;
 using NUnit.Framework;
@@ -9,7 +10,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.Automapping
 {
     public abstract class BaseAutoMapTester<T>
-        where T : IAutoMapper, new()
+        where T : IAutomappingStep, new()
     {
         private T mapper;
 

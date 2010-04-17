@@ -1,8 +1,8 @@
-using FluentNHibernate.MappingModel;
+﻿using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
 
-namespace FluentNHibernate.Automapping
+namespace FluentNHibernate.Automapping.Steps
 {
     public class AutoKeyMapper
     {

@@ -1,17 +1,16 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Reflection;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
 
-namespace FluentNHibernate.Automapping
+namespace FluentNHibernate.Automapping.Steps
 {
-    public class AutoMapManyToMany : IAutoMapper
+    public class HasManyToManyStep : IAutomappingStep
     {
         private readonly IAutomappingConfiguration cfg;
 
-        public AutoMapManyToMany(IAutomappingConfiguration cfg)
+        public HasManyToManyStep(IAutomappingConfiguration cfg)
         {
             this.cfg = cfg;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FluentNHibernate.Automapping;
+using FluentNHibernate.Automapping.Steps;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
@@ -159,14 +160,14 @@ namespace FluentNHibernate.Specs.Automapping
         Establish context = () =>
         {
             cfg = new TestConfiguration();
-            step = new AutoMapOneToMany(cfg);
+            step = new HasManyStep(cfg);
             container = new ClassMapping
             {
                 Type = FakeMembers.Type
             };
         };
 
-        protected static AutoMapOneToMany step;
+        protected static HasManyStep step;
         protected static ClassMapping container;
         protected static TestConfiguration cfg;
 
@@ -186,10 +187,10 @@ namespace FluentNHibernate.Specs.Automapping
         Establish context = () =>
         {
             cfg = new DefaultAutomappingConfiguration();
-            step = new AutoSimpleTypeCollection(cfg);
+            step = new SimpleTypeCollectionStep(cfg);
         };
 
-        protected static AutoSimpleTypeCollection step;
+        protected static SimpleTypeCollectionStep step;
         protected static IAutomappingConfiguration cfg;
     }
 }

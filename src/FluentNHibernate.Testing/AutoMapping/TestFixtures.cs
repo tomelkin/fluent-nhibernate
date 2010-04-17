@@ -192,6 +192,7 @@ namespace FluentNHibernate.Automapping.TestFixtures.ComponentTypes
         public int Number { get; set; }
         public string Street { get; set; }
         public Custom Custom { get; set; }
+        public IList<Customer> Residents { get; set; }
     }
 }
 

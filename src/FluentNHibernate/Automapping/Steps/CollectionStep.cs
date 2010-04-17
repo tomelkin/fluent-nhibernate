@@ -1,17 +1,17 @@
-using FluentNHibernate.MappingModel;
+﻿using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
 using FluentNHibernate.Utils;
 
-namespace FluentNHibernate.Automapping
+namespace FluentNHibernate.Automapping.Steps
 {
-    public class AutoEntityCollection : IAutoMapper
+    public class CollectionStep : IAutomappingStep
     {
         readonly IAutomappingConfiguration cfg;
         readonly AutoKeyMapper keys;
         AutoCollectionCreator collections;
 
-        public AutoEntityCollection(IAutomappingConfiguration cfg)
+        public CollectionStep(IAutomappingConfiguration cfg)
         {
             this.cfg = cfg;
             keys = new AutoKeyMapper(cfg);

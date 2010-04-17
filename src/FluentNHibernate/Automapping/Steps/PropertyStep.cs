@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Reflection;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.AcceptanceCriteria;
 using FluentNHibernate.Conventions.Inspections;
@@ -9,14 +8,14 @@ using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils;
 
-namespace FluentNHibernate.Automapping
+namespace FluentNHibernate.Automapping.Steps
 {
-    public class AutoMapProperty : IAutoMapper
+    public class PropertyStep : IAutomappingStep
     {
         private readonly IConventionFinder conventionFinder;
         private readonly IAutomappingConfiguration cfg;
 
-        public AutoMapProperty(IConventionFinder conventionFinder, IAutomappingConfiguration cfg)
+        public PropertyStep(IConventionFinder conventionFinder, IAutomappingConfiguration cfg)
         {
             this.conventionFinder = conventionFinder;
             this.cfg = cfg;

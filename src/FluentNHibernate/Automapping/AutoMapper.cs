@@ -10,26 +10,16 @@ namespace FluentNHibernate.Automapping
 {
     public class AutoMapper
     {
-        private readonly List<IAutoMapper> mappingRules;
-        private List<AutoMapType> mappingTypes;
+        List<AutoMapType> mappingTypes;
         readonly IAutomappingConfiguration cfg;
-        private readonly IEnumerable<InlineOverride> inlineOverrides;
+        readonly IConventionFinder conventionFinder;
+        readonly IEnumerable<InlineOverride> inlineOverrides;
 
         public AutoMapper(IAutomappingConfiguration cfg, IConventionFinder conventionFinder, IEnumerable<InlineOverride> inlineOverrides)
         {
             this.cfg = cfg;
+            this.conventionFinder = conventionFinder;
             this.inlineOverrides = inlineOverrides;
-
-            mappingRules = new List<IAutoMapper>
-            {
-                new AutoMapIdentity(cfg), 
-                new AutoMapVersion(), 
-                new AutoMapComponent(cfg, this),
-                new AutoMapProperty(conventionFinder, cfg),
-                new AutoMapManyToMany(cfg),
-                new AutoMapManyToOne(),
-                new AutoMapOneToMany(cfg),
-            };
         }
 
         private void ApplyOverrides(Type classType, IList<Member> mappedMembers, ClassMappingBase mapping)
@@ -123,7 +113,7 @@ namespace FluentNHibernate.Automapping
         {
             if (member.HasIndexParameters) return;
 
-            foreach (var rule in mappingRules)
+            foreach (var rule in cfg.GetMappingSteps(this, conventionFinder))
             {
                 if (!rule.ShouldMap(member)) continue;
                 if (mappedMembers.Contains(member)) continue;

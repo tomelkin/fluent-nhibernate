@@ -58,9 +58,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Automapping\AutoMapBackwardsCompatibilitySpecs.cs" />
     <Compile Include="Automapping\AutomappingSpecs.Properties.Enum.cs" />
     <Compile Include="Automapping\AutomappingSpecs.ElementCollections.cs" />
+    <Compile Include="Automapping\AutoPersistenceModelSpecs.cs" />
+    <Compile Include="Automapping\AutoPersistenceModelSpecs.Conventions.cs" />
     <Compile Include="Automapping\Fixtures\AutomappingSpecExtensions.cs" />
+    <Compile Include="Automapping\Fixtures\Entity.cs" />
     <Compile Include="Automapping\Fixtures\EntityWithStaticProperties.cs" />
     <Compile Include="Automapping\Fixtures\EntityUsingPrivateFields.cs" />
     <Compile Include="Automapping\Fixtures\FakeMembers.cs" />

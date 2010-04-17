@@ -1,24 +1,25 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using FluentNHibernate.Automapping;
+using FluentNHibernate.Automapping.Steps;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
 using FluentNHibernate.Utils.Reflection;
 using Iesi.Collections.Generic;
 using NUnit.Framework;
 
-namespace FluentNHibernate.Testing.Automapping
+namespace FluentNHibernate.Testing.AutoMapping.Steps
 {
     [TestFixture]
-    public class AutoMapOneToManyTester
+    public class HasManyStepTests
     {
-        private AutoMapOneToMany mapper;
+        private HasManyStep mapper;
 
         [SetUp]
         public void CreateMapper()
         {
-            mapper = new AutoMapOneToMany(new DefaultAutomappingConfiguration());
+            mapper = new HasManyStep(new DefaultAutomappingConfiguration());
         }
 
         [Test]

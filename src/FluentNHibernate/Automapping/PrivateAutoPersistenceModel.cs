@@ -1,5 +1,8 @@
+using System;
+
 namespace FluentNHibernate.Automapping
 {
+    [Obsolete("Depreciated in favour of supplying your own IAutomappingConfiguration instance to AutoMap: AutoMap.AssemblyOf<T>(your_configuration_instance)")]
     public class PrivateAutoPersistenceModel : AutoPersistenceModel
     {
         public PrivateAutoPersistenceModel()
