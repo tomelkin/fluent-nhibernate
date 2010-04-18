@@ -53,5 +53,10 @@ namespace FluentNHibernate.Utils
         {
             return type.GetInterfaces().Contains(interfaceType);
         }
+
+        public static bool HasInterface<T>(this Type type)
+        {
+            return type.HasInterface(typeof(T));
+        }
     }
 }

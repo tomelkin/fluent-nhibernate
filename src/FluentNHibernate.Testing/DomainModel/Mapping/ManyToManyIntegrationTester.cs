@@ -10,11 +10,10 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
     {
         private class ManyToManyPersistenceModel : PersistenceModel
         {
-            public override void Configure(Configuration configuration)
+            public ManyToManyPersistenceModel()
             {
                 Add(new ChildObjectMap());
                 Add(new ManyToManyTargetMap());
-                base.Configure(configuration);
             }
 
             private class ChildObjectMap : ClassMap<ChildObject>

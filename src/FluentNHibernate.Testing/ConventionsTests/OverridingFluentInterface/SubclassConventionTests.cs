@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using FluentNHibernate.Automapping.TestFixtures;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers.Builders;
 using FluentNHibernate.Conventions.Instances;
 using FluentNHibernate.Mapping;
@@ -13,14 +14,15 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
     [TestFixture]
     public class SubclassConventionTests
     {
-        private PersistenceModel model;
-        private IMappingProvider mapping;
+        private IProvider mapping;
         private Type mappingType;
+        SubclassMap<ExampleInheritedClass> subclassMap;
+        ConventionsCollection conventions;
 
         [SetUp]
         public void CreatePersistenceModel()
         {
-            model = new PersistenceModel();
+            conventions = new ConventionsCollection();
         }
 
         [Test]
@@ -97,7 +99,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void Convention(Action<ISubclassInstance> convention)
         {
-            model.Conventions.Add(new SubclassConventionBuilder().Always(convention));
+            conventions.Add(new SubclassConventionBuilder().Always(convention));
         }
 
         private void Mapping(Action<SubclassMap<ExampleInheritedClass>> mappingDefinition)
@@ -106,11 +108,9 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
             classMap.Id(x => x.Id);
             classMap.DiscriminateSubClassesOnColumn("col");
 
-            var subclassMap = new SubclassMap<ExampleInheritedClass>();
+            subclassMap = new SubclassMap<ExampleInheritedClass>();
 
             mappingDefinition(subclassMap);
-
-            model.Add(subclassMap);
 
             mapping = classMap;
             mappingType = typeof(ExampleClass);
@@ -118,9 +118,11 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void VerifyModel(Action<SubclassMapping> modelVerification)
         {
-            model.Add(mapping);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(mapping, subclassMap));
+            instructions.UseConventions(conventions);
 
-            var generatedModels = model.BuildMappings();
+            var generatedModels = instructions.BuildMappings();
             var modelInstance = generatedModels
                 .First(x => x.Classes.FirstOrDefault(c => c.Type == mappingType) != null)
                 .Classes.First()

@@ -454,6 +454,7 @@
     <Compile Include="AutoMapping\Steps\ReferenceStepTests.cs" />
     <Compile Include="AutoMapping\Steps\HasManyStepTests.cs" />
     <Compile Include="AutoMapping\Steps\VersionStepTests.cs" />
+    <Compile Include="ConventionsTests\ApplyingToModel\BaseConventionTestFixture.cs" />
     <Compile Include="ConventionsTests\AutoImportHelperTests.cs" />
     <Compile Include="ConventionsTests\DefaultAccessHelperTests.cs" />
     <Compile Include="ConventionsTests\DefaultCascadeHelperTests.cs" />

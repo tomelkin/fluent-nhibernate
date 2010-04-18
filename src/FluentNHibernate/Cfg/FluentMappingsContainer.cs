@@ -31,7 +31,7 @@ namespace FluentNHibernate.Cfg
 
         public FluentMappingsContainer OverrideBiDirectionalManyToManyPairing(PairBiDirectionalManyToManySidesDelegate userControlledPairing)
         {
-            model.BiDirectionalManyToManyPairer = userControlledPairing;
+            //model.BiDirectionalManyToManyPairer = userControlledPairing;
             return this;
         }
 
@@ -126,18 +126,18 @@ namespace FluentNHibernate.Cfg
                 model.AddMappingsFromAssembly(assembly);
             }
 
-            foreach (var type in types)
-            {
-                model.Add(type);
-            }
+            //foreach (var type in types)
+            //{
+            //    model.Add(type);
+            //}
 
-            if (!string.IsNullOrEmpty(exportPath))
-                model.WriteMappingsTo(exportPath);
+            //if (!string.IsNullOrEmpty(exportPath))
+            //    model.WriteMappingsTo(exportPath);
 
-            if (exportTextWriter != null)
-                model.WriteMappingsTo(exportTextWriter);
+            //if (exportTextWriter != null)
+            //    model.WriteMappingsTo(exportTextWriter);
 
-            model.Configure(cfg);
+            //model.Configure(cfg);
         }
     }
 }

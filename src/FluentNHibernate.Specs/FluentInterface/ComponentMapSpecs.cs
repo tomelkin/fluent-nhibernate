@@ -73,7 +73,7 @@ namespace FluentNHibernate.Specs.FluentInterface
         };
 
         Because of = () =>
-            mapping = (classmap as IMappingProvider).GetClassMapping()
+            mapping = classmap.GetClassMapping()
                 .Components.First();
 
         It should_create_a_reference_component_mapping = () =>
@@ -107,15 +107,13 @@ namespace FluentNHibernate.Specs.FluentInterface
             var subclass_map = new SubclassMap<TargetChild>();
             subclass_map.Component(x => x.Component);
 
-            persistence_model = new FluentNHibernate.PersistenceModel();
-            persistence_model.Add(class_map);
-            persistence_model.Add(subclass_map);
-            persistence_model.Add(component_map);
+            instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(class_map, subclass_map, component_map));
         };
 
         Because of = () =>
         {
-            mappings = persistence_model.BuildMappings();
+            mappings = instructions.BuildMappings();
             class_mapping = mappings.SelectMany(x => x.Classes).First();
         };
 
@@ -130,7 +128,7 @@ namespace FluentNHibernate.Specs.FluentInterface
             component_mapping.Properties.ShouldContain(x => x.Name == "Property");
         };
 
-        private static FluentNHibernate.PersistenceModel persistence_model;
+        private static PersistenceInstructions instructions;
         private static IEnumerable<HibernateMapping> mappings;
         private static ClassMapping class_mapping;
 
@@ -183,14 +181,13 @@ namespace FluentNHibernate.Specs.FluentInterface
             class_map.Id(x => x.Id);
             class_map.Component(x => x.Component);
 
-            persistence_model = new FluentNHibernate.PersistenceModel();
-            persistence_model.Add(class_map);
-            persistence_model.Add(component_map);
+            instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(class_map, component_map));
         };
 
         Because of = () =>
         {
-            mappings = persistence_model.BuildMappings();
+            mappings = instructions.BuildMappings();
             class_mapping = mappings.SelectMany(x => x.Classes).First();
         };
 
@@ -202,7 +199,7 @@ namespace FluentNHibernate.Specs.FluentInterface
             component_mapping.Properties.ShouldContain(x => x.Name == "Property");
         };
 
-        private static FluentNHibernate.PersistenceModel persistence_model;
+        private static PersistenceInstructions instructions;
         private static IEnumerable<HibernateMapping> mappings;
         private static ClassMapping class_mapping;
 

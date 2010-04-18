@@ -17,10 +17,10 @@ namespace FluentNHibernate.Automapping
             : base(keyColumn)
         {}
 
-        public object GetMapping()
-        {
-            return ((ISubclassMappingProvider)this).GetSubclassMapping();
-        }
+        //public object GetMapping()
+        //{
+        //    return ((ISubclassMappingProvider)this).GetSubclassMapping();
+        //}
 
         void IAutoClasslike.DiscriminateSubClassesOnColumn(string column)
         {
@@ -123,6 +123,11 @@ namespace FluentNHibernate.Automapping
         public IEnumerable<Member> GetIgnoredProperties()
         {
             return membersMapped;
+        }
+
+        public ITopMapping GetMapping()
+        {
+            throw new NotImplementedException();
         }
     }
 }

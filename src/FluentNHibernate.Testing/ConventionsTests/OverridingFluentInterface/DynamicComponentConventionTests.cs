@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers.Builders;
 using FluentNHibernate.Conventions.Instances;
 using FluentNHibernate.Mapping;
@@ -13,14 +14,14 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
     [TestFixture]
     public class DynamicComponentConventionTests
     {
-        private PersistenceModel model;
-        private IMappingProvider mapping;
+        private IProvider mapping;
         private Type mappingType;
+        ConventionsCollection conventions;
 
         [SetUp]
         public void CreatePersistenceModel()
         {
-            model = new PersistenceModel();
+            conventions = new ConventionsCollection();
         }
 
         [Test]
@@ -77,7 +78,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void Convention(Action<IDynamicComponentInstance> convention)
         {
-            model.Conventions.Add(new DynamicComponentConventionBuilder().Always(convention));
+            conventions.Add(new DynamicComponentConventionBuilder().Always(convention));
         }
 
         private void Mapping(Action<DynamicComponentPart<IDictionary>> mappingDefinition)
@@ -99,9 +100,11 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void VerifyModel(Action<ComponentMapping> modelVerification)
         {
-            model.Add(mapping);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(mapping));
+            instructions.UseConventions(conventions);
 
-            var generatedModels = model.BuildMappings();
+            var generatedModels = instructions.BuildMappings();
             var modelInstance = (ComponentMapping)generatedModels
                 .First(x => x.Classes.FirstOrDefault(c => c.Type == mappingType) != null)
                 .Classes.First()

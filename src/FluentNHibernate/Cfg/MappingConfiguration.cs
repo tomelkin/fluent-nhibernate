@@ -54,9 +54,9 @@ namespace FluentNHibernate.Cfg
             if (mergeMappings)
             {
                 foreach (var model in AutoMappings)
-                    model.MergeMappings = true;
+                    model.MergeMappings();
 
-                FluentMappings.PersistenceModel.MergeMappings = true;
+                //FluentMappings.PersistenceModel.MergeMappings();
             }
 
             HbmMappings.Apply(cfg);

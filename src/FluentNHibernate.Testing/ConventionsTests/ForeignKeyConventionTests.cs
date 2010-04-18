@@ -12,13 +12,12 @@ namespace FluentNHibernate.Testing.ConventionsTests
     [TestFixture]
     public class ForeignKeyConventionTests
     {
-        private PersistenceModel model;
+        ConventionsCollection conventions;
 
         [SetUp]
         public void CreatePersistenceModel()
         {
-            model = new PersistenceModel();
-            model.Conventions.Add<TestForeignKeyConvention>();
+            conventions = new ConventionsCollection {new TestForeignKeyConvention()};
         }
 
         [Test]
@@ -29,9 +28,11 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.Id(x => x.Id);
             classMap.References(x => x.Parent);
 
-            model.Add(classMap);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.UseConventions(conventions);
 
-            model.BuildMappings()
+            instructions.BuildMappings()
                 .First()
                 .Classes.First()
                 .References.First()
@@ -46,9 +47,11 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.Id(x => x.Id);
             classMap.HasMany(x => x.Children);
 
-            model.Add(classMap);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.UseConventions(conventions);
 
-            model.BuildMappings()
+            instructions.BuildMappings()
                 .First()
                 .Classes.First()
                 .Collections.First()
@@ -63,9 +66,11 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.Id(x => x.Id);
             classMap.HasManyToMany(x => x.Children);
 
-            model.Add(classMap);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.UseConventions(conventions);
 
-            model.BuildMappings()
+            instructions.BuildMappings()
                 .First()
                 .Classes.First()
                 .Collections.First()
@@ -80,9 +85,11 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.Id(x => x.Id);
             classMap.Join("two", m => { });
 
-            model.Add(classMap);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.UseConventions(conventions);
 
-            model.BuildMappings()
+            instructions.BuildMappings()
                 .First()
                 .Classes.First()
                 .Joins.First()
@@ -97,10 +104,11 @@ namespace FluentNHibernate.Testing.ConventionsTests
 
             var subclassMap = new SubclassMap<ExampleInheritedClass>();
 
-            model.Add(classMap);
-            model.Add(subclassMap);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap, subclassMap));
+            instructions.UseConventions(conventions);
 
-            model.BuildMappings()
+            instructions.BuildMappings()
                 .First()
                 .Classes.First()
                 .Subclasses.First()

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Visitors;
 using NHibernate.Type;
 
 namespace FluentNHibernate.MappingModel
 {
-    public class FilterDefinitionMapping : MappingBase
+    public class FilterDefinitionMapping : MappingBase, ITopMapping
     {
         private readonly AttributeStore<FilterMapping> attributes;
         private readonly IDictionary<string, IType> parameters;
@@ -69,6 +70,11 @@ namespace FluentNHibernate.MappingModel
             {
                 return ((attributes != null ? attributes.GetHashCode() : 0) * 397) ^ (parameters != null ? parameters.GetHashCode() : 0);
             }
+        }
+
+        public void AddTo(HibernateMapping hbm)
+        {
+            hbm.AddFilter(this);
         }
     }
 }

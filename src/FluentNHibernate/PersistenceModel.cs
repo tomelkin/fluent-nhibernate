@@ -4,11 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Xml;
 using FluentNHibernate.Conventions;
-using FluentNHibernate.Mapping;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
@@ -19,31 +17,89 @@ using NHibernate.Cfg;
 
 namespace FluentNHibernate
 {
-    public class PersistenceModel
+    public interface IPersistenceInstructions
     {
-        protected readonly IList<IMappingProvider> classProviders = new List<IMappingProvider>();
-        protected readonly IList<IFilterDefinition> filterDefinitions = new List<IFilterDefinition>();
-        protected readonly IList<IIndeterminateSubclassMappingProvider> subclassProviders = new List<IIndeterminateSubclassMappingProvider>();
-        protected readonly IList<IExternalComponentMappingProvider> componentProviders = new List<IExternalComponentMappingProvider>();
-        private readonly IList<IMappingModelVisitor> visitors = new List<IMappingModelVisitor>();
-        public bool MergeMappings { get; set; }
-        private IEnumerable<HibernateMapping> compiledMappings;
-        private ValidationVisitor validationVisitor;
-        protected readonly ConventionsCollection conventions = new ConventionsCollection();
-        public PairBiDirectionalManyToManySidesDelegate BiDirectionalManyToManyPairer { get; set; }
+        IEnumerable<IProviderSource> Sources { get; }
+        ConventionsCollection Conventions { get; }
+        IEnumerable<IMappingModelVisitor> Visitors { get; }
+    }
 
-        public PersistenceModel()
+    public interface IPersistenceInstructionGatherer
+    {
+        IPersistenceInstructions GetInstructions();
+    }
+
+    public class MappingInjector
+    {
+        readonly IEnumerable<HibernateMapping> mappings;
+
+        public MappingInjector(IEnumerable<HibernateMapping> mappings)
         {
-            BiDirectionalManyToManyPairer = (c,o,w) => {};
-
-            visitors.Add(new SeparateSubclassVisitor(subclassProviders));
-            visitors.Add(new ComponentReferenceResolutionVisitor(componentProviders));
-            visitors.Add(new ComponentColumnPrefixVisitor());
-            visitors.Add(new BiDirectionalManyToManyPairingVisitor(BiDirectionalManyToManyPairer));
-            visitors.Add(new ManyToManyTableNameVisitor());
-            visitors.Add(new ConventionVisitor(new ConventionFinder(conventions)));
-            visitors.Add((validationVisitor = new ValidationVisitor()));
+            this.mappings = mappings;
         }
+
+        public void Inject(Configuration cfg)
+        {
+            foreach (var mapping in mappings.Where(m => m.Classes.Count() == 0))
+            {
+                var serializer = new MappingXmlSerializer();
+                var document = serializer.Serialize(mapping);
+                cfg.AddDocument(document);
+            }
+
+            foreach (var mapping in mappings.Where(m => m.Classes.Count() > 0))
+            {
+                var serializer = new MappingXmlSerializer();
+                var document = serializer.Serialize(mapping);
+
+                if (cfg.GetClassMapping(mapping.Classes.First().Type) == null)
+                    cfg.AddDocument(document);
+            }
+        }
+    }
+
+    public interface IMappingCompiler
+    {
+        
+    }
+
+    public class MappingCompiler : IMappingCompiler
+    {
+        readonly IPersistenceInstructions instructions;
+
+        public MappingCompiler(IPersistenceInstructions instructions)
+        {
+            this.instructions = instructions;
+        }
+
+        public IEnumerable<HibernateMapping> BuildMappings()
+        {
+            var mappings = CompileProviders(instructions.Sources);
+
+            instructions
+                .Visitors
+                .Each(x => x.Visit(mappings));
+
+            return mappings;
+        }
+
+        IEnumerable<HibernateMapping> CompileProviders(IEnumerable<IProviderSource> sources)
+        {
+            var topMappings = sources
+                .SelectMany(x => x.Compile(this).CompiledMappings);
+            var hbm = new HibernateMapping();
+
+            topMappings.Each(x => x.AddTo(hbm));
+
+            return new[] { hbm };
+        }
+    }
+
+    public class PersistenceModel : IPersistenceInstructionGatherer
+    {
+        readonly List<ITypeSource> sources = new List<ITypeSource>();
+        readonly List<IProvider> instances = new List<IProvider>();
+        readonly ConventionsCollection conventions = new ConventionsCollection();
 
         public IConventionContainer Conventions
         {
@@ -61,14 +117,19 @@ namespace FluentNHibernate
             AddMappingsFromSource(new AssemblyTypeSource(assembly));
         }
 
+        public void Add(IProvider provider)
+        {
+            instances.Add(provider);
+        }
+
         public void AddMappingsFromSource(ITypeSource source)
         {
-            source.GetTypes()
-                .Where(x => IsMappingOf<IMappingProvider>(x) ||
-                            IsMappingOf<IIndeterminateSubclassMappingProvider>(x) ||
-                            IsMappingOf<IExternalComponentMappingProvider>(x) ||
-                            IsMappingOf<IFilterDefinition>(x))
-                .Each(Add);
+            sources.Add(source);
+        }
+
+        public void AddMappings(params IProvider[] providers)
+        {
+            instances.AddRange(providers);
         }
 
         private static Assembly FindTheCallingAssembly()
@@ -90,208 +151,113 @@ namespace FluentNHibernate
             return callingAssembly;
         }
 
-        public void Add(IMappingProvider provider)
+        IPersistenceInstructions IPersistenceInstructionGatherer.GetInstructions()
         {
-            classProviders.Add(provider);
+            var instructions = new PersistenceInstructions();
+
+            var mappingProviders = new List<IProvider>();
+
+            mappingProviders.AddRange(instances); // add pre-instantiated maps
+            mappingProviders.AddRange(GetProvidersFromSources());
+
+            instructions.AddSource(new FluentMappingSource(mappingProviders));
+            instructions.UseConventions(conventions);
+
+            return instructions;
         }
 
-        public void Add(IIndeterminateSubclassMappingProvider provider)
+        IEnumerable<IProvider> GetProvidersFromSources()
         {
-            subclassProviders.Add(provider);
+            // TODO: Add user-defined filtering in here
+            return sources
+                .SelectMany(x => x.GetTypes())
+                .Where(x => x.HasInterface<IProvider>())
+                .Select(x => x.InstantiateUsingParameterlessConstructor())
+                .Cast<IProvider>();
         }
 
-        public void Add(IFilterDefinition definition)
+        class SingleTypeSource : ITypeSource
         {
-            filterDefinitions.Add(definition);
-        }
+            readonly Type type;
 
-        public void Add(IExternalComponentMappingProvider provider)
-        {
-            componentProviders.Add(provider);
-        }
-
-        public void Add(Type type)
-        {
-            var mapping = type.InstantiateUsingParameterlessConstructor();
-
-            if (mapping is IMappingProvider)
-                Add((IMappingProvider)mapping);
-            else if (mapping is IIndeterminateSubclassMappingProvider)
-                Add((IIndeterminateSubclassMappingProvider)mapping);
-            else if (mapping is IFilterDefinition)
-                Add((IFilterDefinition)mapping);
-            else if (mapping is IExternalComponentMappingProvider)
-                Add((IExternalComponentMappingProvider)mapping);
-            else
-                throw new InvalidOperationException("Unsupported mapping type '" + type.FullName + "'");
-        }
-
-        private bool IsMappingOf<T>(Type type)
-        {
-            return !type.IsGenericType && typeof(T).IsAssignableFrom(type);
-        }
-
-        public virtual IEnumerable<HibernateMapping> BuildMappings()
-        {
-            var hbms = new List<HibernateMapping>();
-
-            if (MergeMappings)
-                BuildSingleMapping(hbms.Add);
-            else
-                BuildSeparateMappings(hbms.Add);
-
-            ApplyVisitors(hbms);
-
-            return hbms;
-        }
-
-        private void BuildSeparateMappings(Action<HibernateMapping> add)
-        {
-            foreach (var classMap in classProviders)
+            public SingleTypeSource(Type type)
             {
-                var hbm = classMap.GetHibernateMapping();
-
-                hbm.AddClass(classMap.GetClassMapping());
-
-                add(hbm);
-            }
-            foreach (var filterDefinition in filterDefinitions)
-            {
-                var hbm = filterDefinition.GetHibernateMapping();
-                hbm.AddFilter(filterDefinition.GetFilterMapping());
-                add(hbm);
-            }
-        }
-
-        private void BuildSingleMapping(Action<HibernateMapping> add)
-        {
-            var hbm = new HibernateMapping();
-
-            foreach (var classMap in classProviders)
-            {
-                hbm.AddClass(classMap.GetClassMapping());
-            }
-            foreach (var filterDefinition in filterDefinitions)
-            {
-                hbm.AddFilter(filterDefinition.GetFilterMapping());
+                this.type = type;
             }
 
-            if (hbm.Classes.Count() > 0)
-                add(hbm);
-        }
-
-        private void ApplyVisitors(IEnumerable<HibernateMapping> mappings)
-        {
-            foreach (var visitor in visitors)
-                visitor.Visit(mappings);
-        }
-
-        private void EnsureMappingsBuilt()
-        {
-            if (compiledMappings != null) return;
-
-            compiledMappings = BuildMappings();
-        }
-
-        protected virtual string GetMappingFileName()
-        {
-            return "FluentMappings.hbm.xml";
-        }
-
-        private string DetermineMappingFileName(HibernateMapping mapping)
-        {
-            if (MergeMappings)
-                return GetMappingFileName();
-
-            if (mapping.Classes.Count() > 0)
-                return mapping.Classes.First().Type.FullName + ".hbm.xml";
-
-            return "filter-def." + mapping.Filters.First().Name + ".hbm.xml";
-        }
-
-        public void WriteMappingsTo(string folder)
-        {
-            WriteMappingsTo(mapping => new XmlTextWriter(Path.Combine(folder, DetermineMappingFileName(mapping)), Encoding.Default), true);
-        }
-
-        public void WriteMappingsTo(TextWriter writer)
-        {            
-            WriteMappingsTo( _ => new XmlTextWriter(writer), false);
-        }
-
-        private void WriteMappingsTo(Func<HibernateMapping, XmlTextWriter> writerBuilder, bool shouldDispose)
-        {
-            EnsureMappingsBuilt();
-
-            foreach (HibernateMapping mapping in compiledMappings)
+            public IEnumerable<Type> GetTypes()
             {
-                var serializer = new MappingXmlSerializer();
-                var document = serializer.Serialize(mapping);
-
-                XmlTextWriter xmlWriter = null;
-
-                try
-                {
-                    xmlWriter = writerBuilder(mapping);
-                    xmlWriter.Formatting = Formatting.Indented;
-                    document.WriteTo(xmlWriter);
-                }
-                finally
-                {
-                    if(shouldDispose && xmlWriter != null)
-                        xmlWriter.Close();
-                }
+                return new[] {type};
             }
-        }
-
-        public virtual void Configure(Configuration cfg)
-        {
-            EnsureMappingsBuilt();
-
-            foreach (var mapping in compiledMappings.Where(m => m.Classes.Count() == 0))
-            {
-                var serializer = new MappingXmlSerializer();
-                XmlDocument document = serializer.Serialize(mapping);
-                cfg.AddDocument(document);
-            }
-
-            foreach (var mapping in compiledMappings.Where(m => m.Classes.Count() > 0))
-            {
-                var serializer = new MappingXmlSerializer();
-                XmlDocument document = serializer.Serialize(mapping);
-
-                if (cfg.GetClassMapping(mapping.Classes.First().Type) == null)
-                    cfg.AddDocument(document);
-            }
-        }
-
-        public bool ContainsMapping(Type type)
-        {
-            return classProviders.Any(x => x.GetType() == type) ||
-                filterDefinitions.Any(x => x.GetType() == type) ||
-                subclassProviders.Any(x => x.GetType() == type) ||
-                componentProviders.Any(x => x.GetType() == type);
-        }
-
-        /// <summary>
-        /// Gets or sets whether validation of mappings is performed. 
-        /// </summary>
-        public bool ValidationEnabled
-        {
-            get { return validationVisitor.Enabled; }
-            set { validationVisitor.Enabled = value; }
         }
     }
 
-    public interface IMappingProvider
+    public class PersistenceInstructions : IPersistenceInstructions
     {
-        ClassMapping GetClassMapping();
-        // HACK: In place just to keep compatibility until verdict is made
-        HibernateMapping GetHibernateMapping();
-        IEnumerable<Member> GetIgnoredProperties();
+        readonly List<IProviderSource> sources = new List<IProviderSource>();
+
+        public IEnumerable<IProviderSource> Sources
+        {
+            get { return sources; }
+        }
+
+        public ConventionsCollection Conventions { get; private set; }
+        
+        public IEnumerable<IMappingModelVisitor> Visitors
+        {
+            get
+            {
+                return new IMappingModelVisitor[]
+                {
+                    new SeparateSubclassVisitor(new List<IIndeterminateSubclassMappingProvider>()),
+                    new ComponentReferenceResolutionVisitor(new IExternalComponentMappingProvider[0]),
+                    new ComponentColumnPrefixVisitor(),
+                    new BiDirectionalManyToManyPairingVisitor((a,b,c) => {}),
+                    new ManyToManyTableNameVisitor(),
+                    new ConventionVisitor(new ConventionFinder(Conventions)),
+                    new ValidationVisitor()
+                };
+            }
+        }
+
+        public void AddSource(IProviderSource source)
+        {
+            sources.Add(source);
+        }
+
+        public void UseConventions(ConventionsCollection collection)
+        {
+            Conventions = collection;
+        }
     }
 
-    public class PassThroughMappingProvider : IMappingProvider
+    public class FluentMappingSource : IProviderSource
+    {
+        readonly IEnumerable<IProvider> instances;
+
+        public FluentMappingSource(IEnumerable<IProvider> instances)
+        {
+            this.instances = instances;
+        }
+
+        public CompilationResult Compile(IMappingCompiler mappingCompiler)
+        {
+            var compiledMappings = new List<ITopMapping>();
+
+            instances
+                .Select(x => x.GetMapping())
+                .Each(compiledMappings.Add);
+
+            return new CompilationResult(compiledMappings);
+        }
+    }
+
+    public interface IProvider
+    {
+        ITopMapping GetMapping();
+    }
+
+    public class PassThroughMappingProvider : IProvider
     {
         private readonly ClassMapping mapping;
 
@@ -300,19 +266,9 @@ namespace FluentNHibernate
             this.mapping = mapping;
         }
 
-        public ClassMapping GetClassMapping()
+        public ITopMapping GetMapping()
         {
             return mapping;
-        }
-
-        public HibernateMapping GetHibernateMapping()
-        {
-            return new HibernateMapping();
-        }
-
-        public IEnumerable<Member> GetIgnoredProperties()
-        {
-            return new Member[0];
         }
     }
 }

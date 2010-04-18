@@ -10,7 +10,7 @@ using NHibernate.Persister.Entity;
 
 namespace FluentNHibernate.Mapping
 {
-    public class ClassMap<T> : ClasslikeMapBase<T>, IMappingProvider
+    public class ClassMap<T> : ClasslikeMapBase<T>, IProvider
     {
         protected readonly AttributeStore<ClassMapping> attributes = new AttributeStore<ClassMapping>();
         private readonly IList<JoinMapping> joins = new List<JoinMapping>();
@@ -42,7 +42,7 @@ namespace FluentNHibernate.Mapping
             Cache = new CachePart(typeof(T));
         }
 
-        ClassMapping IMappingProvider.GetClassMapping()
+        ITopMapping IProvider.GetMapping()
         {
 		    var mapping = new ClassMapping(attributes.CloneInner());
 
@@ -132,11 +132,6 @@ namespace FluentNHibernate.Mapping
                 hibernateMapping.AddImport(import.GetImportMapping());
 
             return hibernateMapping;
-        }
-
-        IEnumerable<Member> IMappingProvider.GetIgnoredProperties()
-        {
-            return new Member[0];
         }
 
         public HibernateMappingPart HibernateMapping

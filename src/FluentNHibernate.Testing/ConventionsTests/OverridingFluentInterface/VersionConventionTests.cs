@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using FluentNHibernate.Automapping.TestFixtures;
 using FluentNHibernate.Automapping.TestFixtures.CustomTypes;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers.Builders;
 using FluentNHibernate.Conventions.Instances;
 using FluentNHibernate.Mapping;
@@ -15,14 +16,14 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
     [TestFixture]
     public class VersionConventionTests
     {
-        private PersistenceModel model;
-        private IMappingProvider mapping;
+        private IProvider mapping;
         private Type mappingType;
+        ConventionsCollection conventions;
 
         [SetUp]
         public void CreatePersistenceModel()
         {
-            model = new PersistenceModel();
+            conventions = new ConventionsCollection();
         }
 
         [Test]
@@ -180,7 +181,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void Convention(Action<IVersionInstance> convention)
         {
-            model.Conventions.Add(new VersionConventionBuilder().Always(convention));
+            conventions.Add(new VersionConventionBuilder().Always(convention));
         }
 
         private void Mapping(Expression<Func<ValidVersionClass, object>> property, Action<VersionPart> mappingDefinition)
@@ -197,9 +198,11 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void VerifyModel(Action<VersionMapping> modelVerification)
         {
-            model.Add(mapping);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(mapping));
+            instructions.UseConventions(conventions);
 
-            var generatedModels = model.BuildMappings();
+            var generatedModels = instructions.BuildMappings();
             var modelInstance = generatedModels
                 .First(x => x.Classes.FirstOrDefault(c => c.Type == mappingType) != null)
                 .Classes.First()

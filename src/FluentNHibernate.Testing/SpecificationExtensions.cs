@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using FluentNHibernate.MappingModel;
+using FluentNHibernate.MappingModel.ClassBased;
+using NHibernate.Cfg;
 using NUnit.Framework;
 
 namespace FluentNHibernate.Testing
@@ -306,5 +309,60 @@ namespace FluentNHibernate.Testing
         {
             return instance as T;
         }
+
+        public static IEnumerable<HibernateMapping> BuildMappings(this PersistenceModel model)
+        {
+            return model.As<IPersistenceInstructionGatherer>()
+                .GetInstructions()
+                .BuildMappings();
+        }
+
+        public static IEnumerable<HibernateMapping> BuildMappings(this IPersistenceInstructions instructions)
+        {
+            return new MappingCompiler(instructions)
+                .BuildMappings();
+        }
+
+        public static void Configure(this PersistenceModel model, Configuration cfg)
+        {
+            var mappings = model.BuildMappings();
+            var injector = new MappingInjector(mappings);
+
+            injector.Inject(cfg);
+        }
+
+        public static ClassMapping GetClassMapping(this IProvider provider)
+        {
+            var instructions = new PersistenceInstructions();
+
+            instructions.AddSource(new StubProviderSource(provider));
+
+            var compiler = new MappingCompiler(instructions);
+
+            return compiler.BuildMappings()
+                .SelectMany(x => x.Classes)
+                .First();
+        }
     }
+
+    public class StubProviderSource : IProviderSource
+    {
+        readonly IEnumerable<IProvider> providers;
+
+        public StubProviderSource(params IProvider[] providers)
+        {
+            this.providers = providers;
+        }
+
+        public StubProviderSource(IEnumerable<IProvider> providers)
+        {
+            this.providers = providers;
+        }
+
+        public CompilationResult Compile(IMappingCompiler mappingCompiler)
+        {
+            return new CompilationResult(providers.Select(x => x.GetMapping()));
+        }
+    }
+
 }

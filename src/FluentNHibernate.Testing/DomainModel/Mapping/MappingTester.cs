@@ -23,7 +23,6 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public MappingTester(PersistenceModel model)
         {
             this.model = model;
-            this.model.ValidationEnabled = false;
         }
 
         public virtual MappingTester<T> RootElement

@@ -15,9 +15,9 @@ namespace FluentNHibernate.Testing.AutoMapping.Apm
         public void ShouldAllowPropertiesWithSameNameToExistInDerivedClasses()
         {
             var automapper =
-                AutoMap.Source(new StubTypeSource(new[] { typeof(BaseDomain), typeof(Subclass1), typeof(Subclass2), typeof(Subclass3) }));
+                AutoMap.Source(new StubTypeSource(new[] {typeof(BaseDomain), typeof(Subclass1), typeof(Subclass2), typeof(Subclass3)}))
+                    .MergeMappings();
 
-            automapper.MergeMappings = true;
             var mappings = automapper.BuildMappings();
 
             mappings

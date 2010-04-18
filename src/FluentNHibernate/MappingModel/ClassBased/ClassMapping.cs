@@ -5,7 +5,12 @@ using FluentNHibernate.Visitors;
 
 namespace FluentNHibernate.MappingModel.ClassBased
 {
-    public class ClassMapping : ClassMappingBase
+    public interface ITopMapping
+    {
+        void AddTo(HibernateMapping hbm);
+    }
+
+    public class ClassMapping : ClassMappingBase, ITopMapping
     {
         private readonly AttributeStore<ClassMapping> attributes;
 
@@ -245,6 +250,11 @@ namespace FluentNHibernate.MappingModel.ClassBased
         public override int GetHashCode()
         {
             return (attributes != null ? attributes.GetHashCode() : 0);
+        }
+
+        public void AddTo(HibernateMapping hbm)
+        {
+            hbm.AddClass(this);
         }
     }
 }

@@ -102,20 +102,6 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
         }
 
         [Test]
-        public void AddByTypeShouldSupportSubclasses()
-        {
-            var model = new PersistenceModel();
-
-            model.Add(new TablePerSubclass.TPS_ParentMap());
-            model.Add(typeof(TablePerSubclass.TPS_ChildMap));
-
-            model.BuildMappings()
-                .First()
-                .Classes.First()
-                .Subclasses.Count().ShouldBeGreaterThan(0);
-        }
-
-        [Test]
         public void ShouldPickUpSubclassMapsWhenAddingFromAssembly()
         {
             var model = new PersistenceModel();

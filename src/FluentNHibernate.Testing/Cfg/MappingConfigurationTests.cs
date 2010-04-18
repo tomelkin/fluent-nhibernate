@@ -194,7 +194,8 @@ namespace FluentNHibernate.Testing.Cfg
             mapping.AutoMappings.Add(AutoMap.Source(new EmptySource()));
             mapping.MergeMappings();
             mapping.Apply(new Configuration());
-            mapping.AutoMappings.First().MergeMappings.ShouldBeTrue();
+            Assert.Fail();
+            //mapping.AutoMappings.First().MergeMappings.ShouldBeTrue();
         }
 
         [Test]
@@ -202,7 +203,8 @@ namespace FluentNHibernate.Testing.Cfg
         {
             mapping.MergeMappings();
             mapping.Apply(new Configuration());
-            mapping.FluentMappings.PersistenceModel.MergeMappings.ShouldBeTrue();
+            Assert.Fail();
+            //mapping.FluentMappings.PersistenceModel.MergeMappings.ShouldBeTrue();
         }
     }
 }

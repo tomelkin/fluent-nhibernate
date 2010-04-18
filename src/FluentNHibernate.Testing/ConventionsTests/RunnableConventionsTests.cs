@@ -691,26 +691,26 @@ namespace FluentNHibernate.Testing.ConventionsTests
 
         #endregion
 
-        private ClassMapping TestConvention<T>(T convention, Func<IMappingProvider> getMapping) where T : IConvention
+        private ClassMapping TestConvention<T>(T convention, Func<IProvider> getMapping) where T : IConvention
         {
-            var model = new PersistenceModel();
+            var conventions = new ConventionsCollection {convention};
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(getMapping()));
+            instructions.UseConventions(conventions);
 
-            model.Conventions.Add(convention);
-            model.Add(getMapping());
-
-            return model.BuildMappings()
+            return instructions.BuildMappings()
                 .First()
                 .Classes.First();
         }
 
-        private HibernateMapping TestConvention(HibernateMappingConvention convention, Func<IMappingProvider> getMapping)
+        private HibernateMapping TestConvention(HibernateMappingConvention convention, Func<IProvider> getMapping)
         {
-            var model = new PersistenceModel();
+            var conventions = new ConventionsCollection { convention };
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(getMapping()));
+            instructions.UseConventions(conventions);
 
-            model.Conventions.Add(convention);
-            model.Add(getMapping());
-
-            return model.BuildMappings()
+            return instructions.BuildMappings()
                 .First();
         }
 

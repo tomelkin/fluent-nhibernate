@@ -24,14 +24,15 @@ namespace FluentNHibernate.Testing.ConventionsTests
         [SetUp]
         public void SetUp()
         {
-            PersistenceModel model = new PersistenceModel();
+            var model = new PersistenceModel();
             model.Conventions.Add(new BackfieldAccessConvention());
 
-            model.Add(new CompositeIdModelMapping());
-            model.Add(new ManyToManyModelMapping());
-            model.Add(new ManyToOneModelMapping());
-            model.Add(new OneToOneModelMapping());
-            model.Add(new ParentModelMapping());
+            model.AddMappings(
+                new CompositeIdModelMapping(),
+                new ManyToManyModelMapping(),
+                new ManyToOneModelMapping(),
+                new OneToOneModelMapping(),
+                new ParentModelMapping());
 
             var classMappings = model.BuildMappings().SelectMany(x => x.Classes).ToDictionary(x => x.Type);
             compositeId = classMappings[typeof(CompositeIdModel)];

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using FluentNHibernate.Automapping.TestFixtures;
 using FluentNHibernate.Automapping.TestFixtures.CustomTypes;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers.Builders;
 using FluentNHibernate.Conventions.Instances;
 using FluentNHibernate.Mapping;
@@ -15,13 +16,13 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
     [TestFixture]
     public class KeyManyToOneConventionTests
     {
-        private PersistenceModel model;
-        private IMappingProvider mapping;
+        private IProvider mapping;
+        ConventionsCollection conventions;
 
         [SetUp]
         public void CreatePersistenceModel()
         {
-            model = new PersistenceModel();
+            conventions = new ConventionsCollection();
         }
 
         [Test]
@@ -68,7 +69,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void Convention(Action<IKeyManyToOneInstance> convention)
         {
-            model.Conventions.Add(new KeyManyToOneConventionBuilder().Always(convention));
+            conventions.Add(new KeyManyToOneConventionBuilder().Always(convention));
         }
 
         private void Mapping(Action<KeyManyToOnePart> mappingDefinition)
@@ -83,9 +84,11 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void VerifyModel(Action<KeyManyToOneMapping> modelVerification)
         {
-            model.Add(mapping);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(mapping));
+            instructions.UseConventions(conventions);
 
-            var generatedModels = model.BuildMappings();
+            var generatedModels = instructions.BuildMappings();
             var modelInstance = generatedModels
                 .First(x => x.Classes.FirstOrDefault(c => c.Type == typeof(ExampleClass)) != null)
                 .Classes.First()

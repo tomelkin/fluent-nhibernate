@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using FluentNHibernate.MappingModel;
+using FluentNHibernate.MappingModel.ClassBased;
 
 namespace FluentNHibernate
 {
@@ -9,5 +11,20 @@ namespace FluentNHibernate
     public interface ITypeSource
     {
         IEnumerable<Type> GetTypes();
+    }
+
+    public interface IProviderSource
+    {
+        CompilationResult Compile(IMappingCompiler mappingCompiler);
+    }
+
+    public class CompilationResult
+    {
+        public CompilationResult(IEnumerable<ITopMapping> compiledMappings)
+        {
+            CompiledMappings = compiledMappings;
+        }
+
+        public IEnumerable<ITopMapping> CompiledMappings { get; private set; }
     }
 }

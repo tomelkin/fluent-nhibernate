@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers;
 using FluentNHibernate.Mapping;
 using NUnit.Framework;
@@ -9,22 +10,19 @@ namespace FluentNHibernate.Testing.ConventionsTests
     [TestFixture]
     public class DefaultLazyHelperTests
     {
-        private PersistenceModel model;
-
-        [SetUp]
-        public void CreatePersistenceModel()
-        {
-            model = new PersistenceModel();
-        }
-
         [Test]
         public void AlwaysShouldSetDefaultLazyToTrue()
         {
             var classMap = new ClassMap<Target>();
             classMap.Id(x => x.Id);
-            model.Add(classMap);
-            model.Conventions.Add(DefaultLazy.Always());
-            model.BuildMappings()
+            
+            var conventions = new ConventionsCollection {DefaultLazy.Always()};
+
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.UseConventions(conventions);
+
+            instructions.BuildMappings()
                 .First()
                 .DefaultLazy.ShouldBeTrue();
         }
@@ -34,9 +32,14 @@ namespace FluentNHibernate.Testing.ConventionsTests
         {
             var classMap = new ClassMap<Target>();
             classMap.Id(x => x.Id);
-            model.Add(classMap);
-            model.Conventions.Add(DefaultLazy.Never());
-            model.BuildMappings()
+            
+            var conventions = new ConventionsCollection {DefaultLazy.Never()};
+
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.UseConventions(conventions);
+
+            instructions.BuildMappings()
                 .First()
                 .DefaultLazy.ShouldBeFalse();
         }

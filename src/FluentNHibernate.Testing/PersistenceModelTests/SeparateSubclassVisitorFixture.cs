@@ -29,7 +29,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * GenericFooMap<T> subclass mapping.
              */
 
-            fooMapping = ((IMappingProvider)new FooMap()).GetClassMapping();
+            fooMapping = new FooMap().GetClassMapping();
 
             providers.Add(new StringFooMap());
             var sut = CreateSut();
@@ -46,7 +46,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * GenericFooMap<T> subclass mapping.
              */
 
-            fooMapping = ((IMappingProvider)new BaseMap()).GetClassMapping();
+            fooMapping = new BaseMap().GetClassMapping();
 
             providers.Add(new StringFooMap());
             var sut = CreateSut();
@@ -63,7 +63,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * since it does not implement the interface.
              */
 
-            fooMapping = ((IMappingProvider)new FooMap()).GetClassMapping();
+            fooMapping = new FooMap().GetClassMapping();
 
             providers.Add(new StandAloneMap());
             var sut = CreateSut();
@@ -79,7 +79,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * since it does not implement the interface.
              */
 
-            fooMapping = ((IMappingProvider)new BaseMap()).GetClassMapping();
+            fooMapping = new BaseMap().GetClassMapping();
 
             providers.Add(new StandAloneMap());
             var sut = CreateSut();
@@ -96,7 +96,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * the BaseImpl class which already implements FooBase.
              */
 
-            fooMapping = ((IMappingProvider)new FooMap()).GetClassMapping();
+            fooMapping = new FooMap().GetClassMapping();
 
             providers.Add(new BaseImplMap());
             providers.Add(new StringFooMap());
@@ -115,7 +115,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
              * the BaseImpl class which already implements FooBase.
              */
 
-            fooMapping = ((IMappingProvider)new BaseMap()).GetClassMapping();
+            fooMapping = new BaseMap().GetClassMapping();
 
             providers.Add(new BaseImplMap());
             providers.Add(new StringFooMap());
@@ -128,7 +128,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
         [Test]
         public void Should_add_explicit_extend_subclasses_to_their_parent()
         {
-            fooMapping = ((IMappingProvider)new ExtendsParentMap()).GetClassMapping();
+            fooMapping = new ExtendsParentMap().GetClassMapping();
 
             providers.Add(new ExtendsChildMap());
             var sut = CreateSut();

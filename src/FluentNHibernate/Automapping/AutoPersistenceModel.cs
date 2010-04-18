@@ -14,7 +14,7 @@ namespace FluentNHibernate.Automapping
     {
         readonly IAutomappingConfiguration cfg;
         readonly AutoMappingExpressions expressions;
-        readonly AutoMapper autoMapper;
+        readonly AutoMapper autoMapper = null;
         readonly List<ITypeSource> sources = new List<ITypeSource>();
         Func<Type, bool> whereClause;
         readonly List<AutoMapType> mappingTypes = new List<AutoMapType>();
@@ -28,13 +28,13 @@ namespace FluentNHibernate.Automapping
         {
             expressions = new AutoMappingExpressions();
             cfg = new ExpressionBasedAutomappingConfiguration(expressions);
-            autoMapper = new AutoMapper(cfg, new ConventionFinder(conventions), inlineOverrides);
+            //autoMapper = new AutoMapper(cfg, new ConventionFinder(conventions), inlineOverrides);
         }
 
         public AutoPersistenceModel(IAutomappingConfiguration cfg)
         {
             this.cfg = cfg;
-            autoMapper = new AutoMapper(cfg, new ConfigurationBasedFinder(conventions, cfg), inlineOverrides);
+            //autoMapper = new AutoMapper(cfg, new ConfigurationBasedFinder(conventions, cfg), inlineOverrides);
         }
 
         /// <summary>
@@ -49,6 +49,12 @@ namespace FluentNHibernate.Automapping
 
                 return new SetupConventionContainer<AutoPersistenceModel>(this, base.Conventions);
             }
+        }
+
+        public AutoPersistenceModel MergeMappings()
+        {
+            //base.MergeMappings();
+            return this;
         }
 
         /// <summary>
@@ -112,11 +118,13 @@ namespace FluentNHibernate.Automapping
             return this;
         }
 
-        public override IEnumerable<HibernateMapping> BuildMappings()
+        public IEnumerable<HibernateMapping> BuildMappings()
         {
             CompileMappings();
 
-            return base.BuildMappings();
+            return null;
+
+            //return base.BuildMappings();
         }
 
         private void CompileMappings()
@@ -157,11 +165,11 @@ namespace FluentNHibernate.Automapping
             autoMappingsCreated = true;
         }
 
-        public override void Configure(NHibernate.Cfg.Configuration configuration)
+        public void Configure(NHibernate.Cfg.Configuration configuration)
         {
             CompileMappings();
 
-            base.Configure(configuration);
+            //base.Configure(configuration);
         }
 
         static bool IsNotInnerClass(AutoMapType type)
@@ -174,7 +182,7 @@ namespace FluentNHibernate.Automapping
             Type typeToMap = GetTypeToMap(type);
             var mapping = autoMapper.Map(typeToMap, mappingTypes);
 
-            Add(new PassThroughMappingProvider(mapping));
+            //persistenceContainer.Add(new PassThroughMappingProvider(mapping));
         }
 
         private Type GetTypeToMap(Type type)
@@ -208,20 +216,20 @@ namespace FluentNHibernate.Automapping
             return true;
         }
 
-        private void MergeMap(Type type, IMappingProvider mapping)
+        private void MergeMap(Type type, IProvider mapping)
         {
             Type typeToMap = GetTypeToMap(type);
-            autoMapper.MergeMap(typeToMap, mapping.GetClassMapping(), new List<Member>(mapping.GetIgnoredProperties()));
+            //autoMapper.MergeMap(typeToMap, mapping.GetClassMapping(), new List<Member>(mapping.GetIgnoredProperties()));
         }
 
-        public IMappingProvider FindMapping<T>()
+        public IProvider FindMapping<T>()
         {
             return FindMapping(typeof(T));
         }
 
-        public IMappingProvider FindMapping(Type type)
+        public IProvider FindMapping(Type type)
         {
-            Func<IMappingProvider, Type, bool> finder = (provider, expectedType) =>
+            Func<IProvider, Type, bool> finder = (provider, expectedType) =>
             {
                 var mappingType = provider.GetType();
                 if (mappingType.IsGenericType)
@@ -235,15 +243,15 @@ namespace FluentNHibernate.Automapping
                     // base type is a generic type of ClassMap<T>, so we've got a XXXMap instance
                     return mappingType.BaseType.GetGenericArguments()[0] == expectedType;
                 }
-                if (provider is PassThroughMappingProvider)
-                    return provider.GetClassMapping().Type == expectedType;
+                //if (provider is PassThroughMappingProvider)
+                //    return provider.GetClassMapping().Type == expectedType;
 
                 return false;
             };
 
-            var mapping = classProviders.FirstOrDefault(t => finder(t, type));
+            //var mapping = persistenceContainer.Classes.FirstOrDefault(t => finder(t, type));
 
-            if (mapping != null) return mapping;
+            //if (mapping != null) return mapping;
 
             // if we haven't found a map yet then try to find a map of the
             // base type to merge if not a concrete base type
@@ -363,11 +371,6 @@ namespace FluentNHibernate.Automapping
         {
             includedTypes.Add(baseType);
             return this;
-        }
-
-        protected override string GetMappingFileName()
-        {
-            return "AutoMappings.hbm.xml";
         }
 
         bool HasUserDefinedConfiguration

@@ -12,8 +12,6 @@ namespace FluentNHibernate.Specs.Automapping
         {
             model = new PrivateAutoPersistenceModel()
                 .Setup(conventions => conventions.FindMembers = m => m.IsField && m.Name.StartsWith("_"));
-
-            model.ValidationEnabled = false;
             model.AddTypeSource(new StubTypeSource(typeof(EntityUsingPrivateFields)));
         };
 

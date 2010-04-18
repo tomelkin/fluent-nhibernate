@@ -44,8 +44,8 @@ namespace FluentNHibernate.Testing.DomainModel
     {
         public MusicPersistenceModel()
         {
-            Add(typeof(ArtistMap));
-            Add(typeof(GenreMap));
+            Add(new ArtistMap());
+            Add(new GenreMap());
         }
     }
 

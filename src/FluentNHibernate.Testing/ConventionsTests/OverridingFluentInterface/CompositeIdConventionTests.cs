@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using FluentNHibernate.Automapping.TestFixtures;
 using FluentNHibernate.Automapping.TestFixtures.CustomTypes;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers.Builders;
 using FluentNHibernate.Conventions.Instances;
 using FluentNHibernate.Mapping;
@@ -15,14 +16,14 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
     [TestFixture]
     public class CompositeIdConventionTests
     {
-        private PersistenceModel model;
-        private IMappingProvider mapping;
+        private IProvider mapping;
         private Type mappingType;
+        ConventionsCollection conventions;
 
         [SetUp]
         public void CreatePersistenceModel()
         {
-            model = new PersistenceModel();
+            conventions = new ConventionsCollection();
         }
 
         [Test]
@@ -59,7 +60,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void Convention(Action<ICompositeIdentityInstance> convention)
         {
-            model.Conventions.Add(new CompositeIdConventionBuilder().Always(convention));
+            conventions.Add(new CompositeIdConventionBuilder().Always(convention));
         }
 
         private void Mapping<T>(Expression<Func<T, object>> property, Action<CompositeIdentityPart<object>> mappingDefinition)
@@ -75,9 +76,11 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
 
         private void VerifyModel(Action<CompositeIdMapping> modelVerification)
         {
-            model.Add(mapping);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(mapping));
+            instructions.UseConventions(conventions);
 
-            var generatedModels = model.BuildMappings();
+            var generatedModels = instructions.BuildMappings();
             var modelInstance = generatedModels
                 .First(x => x.Classes.FirstOrDefault(c => c.Type == mappingType) != null)
                 .Classes.First()

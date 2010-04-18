@@ -43,8 +43,7 @@ namespace FluentNHibernate
             if( model == null ) throw new ArgumentNullException("model", "Model cannot be null");
 
             configuration = nhibernateConfig;
-
-            model.Configure(configuration);
+            configuration.ConfigureWith(model);
 
             sessionFactory = configuration.BuildSessionFactory();
             dialect = Dialect.GetDialect(configuration.Properties);

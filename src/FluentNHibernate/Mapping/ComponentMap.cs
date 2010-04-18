@@ -50,5 +50,10 @@ namespace FluentNHibernate.Mapping
         {
             get { return typeof(T); }
         }
+
+        public ITopMapping GetMapping()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

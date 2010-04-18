@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using FluentNHibernate.Automapping.TestFixtures;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers.Builders;
 using FluentNHibernate.Conventions.Instances;
 using FluentNHibernate.Mapping;
@@ -12,12 +13,12 @@ namespace FluentNHibernate.Testing.ConventionsTests.ApplyingToModel
     [TestFixture]
     public class HibernateMappingConventionTests
     {
-        private PersistenceModel model;
+        ConventionsCollection conventions;
 
         [SetUp]
         public void CreatePersistanceModel()
         {
-            model = new PersistenceModel();
+            conventions = new ConventionsCollection();
         }
 
         [Test]
@@ -72,7 +73,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.ApplyingToModel
 
         private void Convention(Action<IHibernateMappingInstance> convention)
         {
-            model.Conventions.Add(new HibernateMappingConventionBuilder().Always(convention));
+            conventions.Add(new HibernateMappingConventionBuilder().Always(convention));
         }
 
         private void VerifyModel(Action<HibernateMapping> modelVerification)
@@ -80,9 +81,11 @@ namespace FluentNHibernate.Testing.ConventionsTests.ApplyingToModel
             var classMap = new ClassMap<ExampleClass>();
             classMap.Id(x => x.Id);
 
-            model.Add(classMap);
+            var instructions = new PersistenceInstructions();
+            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.UseConventions(conventions);
 
-            var generatedModels = model.BuildMappings();
+            var generatedModels = instructions.BuildMappings();
             var modelInstance = generatedModels
                 .First(x => x.Classes.FirstOrDefault(c => c.Type == typeof(ExampleClass)) != null);
 

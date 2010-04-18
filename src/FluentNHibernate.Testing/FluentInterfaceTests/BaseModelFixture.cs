@@ -19,7 +19,7 @@ namespace FluentNHibernate.Testing.FluentInterfaceTests
     {
         protected ModelTester<ClassMap<T>, ClassMapping> ClassMap<T>()
         {
-            return new ModelTester<ClassMap<T>, ClassMapping>(() => new ClassMap<T>(), x => ((IMappingProvider)x).GetClassMapping());
+            return new ModelTester<ClassMap<T>, ClassMapping>(() => new ClassMap<T>(), x => x.GetClassMapping());
         }
 
         protected ModelTester<DiscriminatorPart, DiscriminatorMapping> DiscriminatorMap<T>()

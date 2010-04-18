@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FluentNHibernate.Automapping;
 using NHibernate.Cfg;
 using System.IO;
@@ -75,11 +76,11 @@ namespace FluentNHibernate.Cfg
         {
             foreach (var mapping in mappings)
             {
-                if (!string.IsNullOrEmpty(exportPath))
-                    mapping.WriteMappingsTo(exportPath);
+                //if (!string.IsNullOrEmpty(exportPath))
+                //    mapping.WriteMappingsTo(exportPath);
 
-                if (exportTextWriter != null)
-                    mapping.WriteMappingsTo(exportTextWriter);
+                //if (exportTextWriter != null)
+                //    mapping.WriteMappingsTo(exportTextWriter);
 
                 mapping.Configure(cfg);
             }
