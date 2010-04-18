@@ -9,7 +9,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideDynamicInsert()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.DynamicInsert())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.DynamicInsert();
+                })
                 .Element("class").HasAttribute("dynamic-insert", "true");
         }
 
@@ -17,7 +21,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideNoDynamicInsert()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.Not.DynamicInsert())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Not.DynamicInsert();
+                })
                 .Element("class").HasAttribute("dynamic-insert", "false");
         }
     }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using FluentNHibernate.Mapping;
+using FluentNHibernate.Utils;
 using FluentNHibernate.Visitors;
 using NHibernate.Cfg;
 using System.IO;
@@ -121,15 +123,14 @@ namespace FluentNHibernate.Cfg
         /// <param name="cfg">NHibernate Configuration instance</param>
         internal void Apply(Configuration cfg)
         {
-            foreach (var assembly in assemblies)
-            {
-                model.AddMappingsFromAssembly(assembly);
-            }
+            assemblies
+                .Each(model.AddMappingsFromAssembly);
 
-            //foreach (var type in types)
-            //{
-            //    model.Add(type);
-            //}
+            types
+                .Where(x => x.HasInterface<IProvider>())
+                .Select(x => x.InstantiateUsingParameterlessConstructor())
+                .Cast<IProvider>()
+                .Each(model.Add);
 
             //if (!string.IsNullOrEmpty(exportPath))
             //    model.WriteMappingsTo(exportPath);
@@ -137,7 +138,7 @@ namespace FluentNHibernate.Cfg
             //if (exportTextWriter != null)
             //    model.WriteMappingsTo(exportTextWriter);
 
-            //model.Configure(cfg);
+            cfg.ConfigureWith(model);
         }
     }
 }

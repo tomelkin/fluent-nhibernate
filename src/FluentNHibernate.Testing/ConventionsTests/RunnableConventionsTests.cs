@@ -266,29 +266,6 @@ namespace FluentNHibernate.Testing.ConventionsTests
                 .Schema.ShouldEqual("dto");
         }
 
-// ignoring warning for JoinedSubClass
-#pragma warning disable 612,618
-
-        [Test]
-        public void ShouldApplyIJoinedSubclassConvention()
-        {
-            var subclass = TestConvention(new JoinedSubclassConvention(), () =>
-            {
-                var map = new ClassMap<Target>();
-
-                map.Id(x => x.Id);
-                map.JoinedSubClass<TargetSubclass>("key", m => { });
-
-                return map;
-            })
-                .Subclasses.First();
-
-            subclass
-                .TableName.ShouldEqual("tbl");
-        }
-
-#pragma warning restore 612,618
-
         [Test]
         public void ShouldApplyIListConvention()
         {

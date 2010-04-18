@@ -215,10 +215,10 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
             public ThoughtMap()
             {
                 Id(x => x.Id);
-#pragma warning disable 618,612
-                JoinedSubClass<Epiphany>("Id", x => { });
-                JoinedSubClass<RandomThought>("Id", x => { });
-#pragma warning restore 618,612
+//#pragma warning disable 618,612
+//                JoinedSubClass<Epiphany>("Id", x => { });
+//                JoinedSubClass<RandomThought>("Id", x => { });
+//#pragma warning restore 618,612
             }
         }
     }

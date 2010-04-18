@@ -196,6 +196,11 @@ namespace FluentNHibernate
     {
         readonly List<IProviderSource> sources = new List<IProviderSource>();
 
+        public PersistenceInstructions()
+        {
+            Conventions = new ConventionsCollection();
+        }
+
         public IEnumerable<IProviderSource> Sources
         {
             get { return sources; }

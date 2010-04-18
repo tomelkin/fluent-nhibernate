@@ -301,7 +301,6 @@
     <Compile Include="DomainModel\Mapping\FetchTypeExpressionTester.cs" />
     <Compile Include="DomainModel\Mapping\DefaultAccessStrategyClassMapTester.cs" />
     <Compile Include="DomainModel\Mapping\IdentityPartTester.cs" />
-    <Compile Include="DomainModel\Mapping\JoinedSubClassTester.cs" />
     <Compile Include="DomainModel\Mapping\JoinPartTester.cs" />
     <Compile Include="DomainModel\Mapping\OneToManyIntegrationTester.cs" />
     <Compile Include="DomainModel\Mapping\OneToManyTester.cs" />

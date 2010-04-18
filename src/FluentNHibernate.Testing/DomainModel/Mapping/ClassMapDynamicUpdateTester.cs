@@ -9,7 +9,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideDynamicUpdate()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.DynamicUpdate())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.DynamicUpdate();
+                })
                 .Element("class").HasAttribute("dynamic-update", "true");
         }
 
@@ -17,7 +21,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideNoDynamicUpdate()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.Not.DynamicUpdate())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Not.DynamicUpdate();
+                })
                 .Element("class").HasAttribute("dynamic-update", "false");
         }
     }

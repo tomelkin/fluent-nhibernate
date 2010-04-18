@@ -9,7 +9,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideOptimisticLockNone()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.OptimisticLock.None())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.OptimisticLock.None();
+                })
                 .Element("class").HasAttribute("optimistic-lock", "none");
         }
 
@@ -17,7 +21,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideOptimisticLockVersion()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.OptimisticLock.Version())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.OptimisticLock.Version();
+                })
                 .Element("class").HasAttribute("optimistic-lock", "version");
         }
 
@@ -25,7 +33,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideOptimisticLockDirty()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.OptimisticLock.Dirty())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.OptimisticLock.Dirty();
+                })
                 .Element("class").HasAttribute("optimistic-lock", "dirty");
         }
 
@@ -33,7 +45,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanOverrideOptimisticLockAll()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.OptimisticLock.All())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.OptimisticLock.All();
+                })
                 .Element("class").HasAttribute("optimistic-lock", "all");
         }
     }

@@ -9,11 +9,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldBeFirstElement()
         {
             new MappingTester<CacheTarget>()
-                .ForMapping(mapping =>
+                .ForMapping(c =>
                 {
-                    mapping.Id(x => x.Id);
-                    mapping.Map(x => x.Name);
-                    mapping.Cache.ReadWrite();
+                    c.Id(x => x.Id);
+                    c.Map(x => x.Name);
+                    c.Cache.ReadWrite();
                 })
                 .Element("class/*[1]").HasName("cache");
         }
@@ -22,7 +22,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldCreateCacheElement()
         {
             new MappingTester<CacheTarget>()
-                .ForMapping(mapping => mapping.Cache.ReadWrite())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Cache.ReadWrite();
+                })
                 .Element("class/cache").Exists();
         }
 
@@ -30,7 +34,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldOutputReadWriteForAsReadWrite()
         {
             new MappingTester<CacheTarget>()
-                .ForMapping(mapping => mapping.Cache.ReadWrite())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Cache.ReadWrite();
+                })
                 .Element("class/cache").HasAttribute("usage", "read-write");
         }
 
@@ -38,7 +46,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldOutputNonstrictReadWriteForAsNonStrictReadWrite()
         {
             new MappingTester<CacheTarget>()
-                .ForMapping(mapping => mapping.Cache.NonStrictReadWrite())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Cache.NonStrictReadWrite();
+                })
                 .Element("class/cache").HasAttribute("usage", "nonstrict-read-write");
         }
 
@@ -46,7 +58,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldOutputNonstrictReadWriteForAsReadOnly()
         {
             new MappingTester<CacheTarget>()
-                .ForMapping(mapping => mapping.Cache.ReadOnly())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Cache.ReadOnly();
+                })
                 .Element("class/cache").HasAttribute("usage", "read-only");
         }
 
@@ -54,7 +70,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldAllowAnythingForAsCustom()
         {
             new MappingTester<CacheTarget>()
-                .ForMapping(mapping => mapping.Cache.CustomUsage("something-else"))
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Cache.CustomUsage("something-else");
+                })
                 .Element("class/cache").HasAttribute("usage", "something-else");
         }
 
@@ -62,7 +82,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldWriteRegionWhenAssigned()
         {
             new MappingTester<CacheTarget>()
-                .ForMapping(mapping => mapping.Cache.ReadWrite().Region("MyRegion"))
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Cache.ReadWrite().Region("MyRegion");
+                })
                 .Element("class/cache").HasAttribute("region", "MyRegion");
         }
 

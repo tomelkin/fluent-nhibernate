@@ -10,12 +10,15 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.HasMany(x => x.Components)
                         .Component(c =>
                         {
                             c.Map(x => x.Name);
                             c.ParentReference(x => x.MyParent);
-                        }))
+                        });
+                })
                 .Element("class/bag/composite-element/parent").Exists()
                 .HasAttribute("name", "MyParent");
         }

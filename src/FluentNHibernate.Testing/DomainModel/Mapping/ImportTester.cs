@@ -9,7 +9,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldAddImportElementsBeforeClass()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(x => x.ImportType<SecondMappedObject>())
+                .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
+                    m.ImportType<SecondMappedObject>();
+                })
                 .Element("import")
                 .Exists()
                 .HasAttribute("class", typeof(SecondMappedObject).AssemblyQualifiedName);
@@ -19,7 +23,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldntAddImportElementsInsideClass()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(x => x.ImportType<SecondMappedObject>())
+                .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
+                    m.ImportType<SecondMappedObject>();
+                })
                 .Element("class/import").DoesntExist();
         }
 
@@ -27,7 +35,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void ShouldAddRenameAttributeWhenDifferentNameSpecified()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(x => x.ImportType<SecondMappedObject>().As("MappedObject"))
+                .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
+                    m.ImportType<SecondMappedObject>().As("MappedObject");
+                })
                 .Element("import").HasAttribute("rename", "MappedObject");
         }
     }

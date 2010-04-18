@@ -11,7 +11,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void DynamicUpdateShouldntSetAttributeIfUnset()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").DoesntHaveAttribute("dynamic-update");
         }
 
@@ -20,7 +20,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(DynamicUpdate.AlwaysTrue()))
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").HasAttribute("dynamic-update", "true");
         }
 
@@ -29,7 +29,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(DynamicUpdate.AlwaysFalse()))
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").HasAttribute("dynamic-update", "false");
         }
 
@@ -38,7 +38,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(DynamicUpdate.AlwaysTrue()))
-                .ForMapping(c => c.Not.DynamicUpdate())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Not.DynamicUpdate();
+                })
                 .Element("class").HasAttribute("dynamic-update", "false");
         }
 
@@ -46,7 +50,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void DynamicInsertShouldntSetAttributeIfUnset()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").DoesntHaveAttribute("dynamic-insert");
         }
 
@@ -55,7 +59,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(DynamicInsert.AlwaysTrue()))
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").HasAttribute("dynamic-insert", "true");
         }
 
@@ -64,7 +68,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(DynamicInsert.AlwaysFalse()))
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").HasAttribute("dynamic-insert", "false");
         }
 
@@ -73,7 +77,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(DynamicInsert.AlwaysTrue()))
-                .ForMapping(c => c.Not.DynamicInsert())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Not.DynamicInsert();
+                })
                 .Element("class").HasAttribute("dynamic-insert", "false");
         }
 
@@ -81,7 +89,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void OptimisticLockShouldntSetAttributeIfNotSupplied()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").DoesntHaveAttribute("optimistic-lock");
         }
 
@@ -90,7 +98,7 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(OptimisticLock.Is(x => x.All())))
-                .ForMapping(c => { })
+                .ForMapping(c => c.Id(x => x.Id))
                 .Element("class").HasAttribute("optimistic-lock", "all");
         }
 
@@ -99,7 +107,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<MappedObject>()
                 .Conventions(conventions => conventions.Add(OptimisticLock.Is(x => x.All())))
-                .ForMapping(c => c.OptimisticLock.Dirty())
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.OptimisticLock.Dirty();
+                })
                 .Element("class").HasAttribute("optimistic-lock", "dirty");
         }
 
@@ -107,7 +119,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void EnumsDontGetTypeOverriddenByConventionsIfExplicitlySet()
         {
             new MappingTester<MappedObject>()
-                .ForMapping(m => m.Map(x => x.Color).CustomType(typeof(int)))
+                .ForMapping(c =>
+                {
+                    c.Id(x => x.Id);
+                    c.Map(x => x.Color).CustomType(typeof(int));
+                })
                 .Element("class/property[@name='Color']").HasAttribute("type", typeof(int).Name);
         }
     }

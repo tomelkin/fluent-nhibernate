@@ -12,13 +12,16 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanGenerateDynamicComponentsWithSingleProperties()
         {
             new MappingTester<PropertyTarget>()
-                .ForMapping(c =>
-                    c.DynamicComponent(x => x.ExtensionData, m =>
+                .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
+                    m.DynamicComponent(x => x.ExtensionData, c =>
                     {
-                        m.Map(x => (string)x["Name"]);
-                        m.Map(x => (int)x["Age"]);
-                        m.Map(x => (string)x["Profession"]);
-                    }))
+                        c.Map(x => (string)x["Name"]);
+                        c.Map(x => (int)x["Age"]);
+                        c.Map(x => (string)x["Profession"]);
+                    });
+                })
                 .Element("//class/dynamic-component/property[@name='Name']").Exists()
                 .Element("//class/dynamic-component/property[@name='Age']").Exists()
                 .Element("//class/dynamic-component/property[@name='Profession']").Exists();
@@ -29,11 +32,14 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             //Regression test for issue 223
             new MappingTester<PropertyTarget>()
-                .ForMapping(c =>
-                    c.DynamicComponent(x => x.ExtensionData, m =>
+                .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
+                    m.DynamicComponent(x => x.ExtensionData, c =>
                     {
-                        m.Map(x => (string)x["Name"]);
-                    }))
+                        c.Map(x => (string)x["Name"]);
+                    });
+                })
                 .Element("//class/dynamic-component").HasThisManyChildNodes(1);
         }
 
@@ -41,23 +47,28 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         public void CanGenerateDynamicComponentsWithInt32Property()
         {
             new MappingTester<PropertyTarget>()
-                .ForMapping(c =>
-                    c.DynamicComponent(x => x.ExtensionData, m =>
+                .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
+                    m.DynamicComponent(x => x.ExtensionData, c =>
                     {
-                        m.Map(x => (int)x["Age"]);
-                    })).Element("//class/dynamic-component/property").HasAttribute("type", typeof(Int32).AssemblyQualifiedName);
-
+                        c.Map(x => (int)x["Age"]);
+                    });
+                }).Element("//class/dynamic-component/property").HasAttribute("type", typeof(Int32).AssemblyQualifiedName);
         }
 
         [Test]
         public void CanGenerateDynamicComponentsWithStringProperty()
         {
             new MappingTester<PropertyTarget>()
-                .ForMapping(c =>
-                    c.DynamicComponent(x => x.ExtensionData, m =>
+                .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
+                    m.DynamicComponent(x => x.ExtensionData, c =>
                     {
-                        m.Map(x => (string)x["Name"]);
-                    })).Element("//class/dynamic-component/property").HasAttribute("type", typeof(string).AssemblyQualifiedName);
+                        c.Map(x => (string)x["Name"]);
+                    });
+                }).Element("//class/dynamic-component/property").HasAttribute("type", typeof(string).AssemblyQualifiedName);
         }
 
         [Test]
@@ -65,8 +76,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
-                        c.References(x => (PropertyReferenceTarget)x["Parent"])))
+                        c.References(x => (PropertyReferenceTarget)x["Parent"]));
+                })
                 .Element("class/dynamic-component/many-to-one").Exists();
         }
 
@@ -75,8 +89,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
-                        c.HasOne(x => (PropertyReferenceTarget)x["Parent"])))
+                        c.HasOne(x => (PropertyReferenceTarget)x["Parent"]));
+                })
                 .Element("class/dynamic-component/one-to-one").Exists();
         }
 
@@ -85,8 +102,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
-                        c.HasMany(x => (IList<PropertyReferenceTarget>)x["Children"])))
+                        c.HasMany(x => (IList<PropertyReferenceTarget>)x["Children"]));
+                })
                 .Element("class/dynamic-component/bag").Exists();
         }
 
@@ -95,8 +115,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
-                        c.HasManyToMany(x => (IList<PropertyReferenceTarget>)x["Children"])))
+                        c.HasManyToMany(x => (IList<PropertyReferenceTarget>)x["Children"]));
+                })
                 .Element("class/dynamic-component/bag").Exists();
         }
 
@@ -105,8 +128,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
-                        c.Component(x => (PropertyReferenceTarget)x["Component"], sc => { })))
+                        c.Component(x => (PropertyReferenceTarget)x["Component"], sc => { }));
+                })
                 .Element("class/dynamic-component/component").Exists();
         }
 
@@ -115,8 +141,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
-                        c.DynamicComponent(x => (IDictionary)x["Component"], sc => { })))
+                        c.DynamicComponent(x => (IDictionary)x["Component"], sc => { }));
+                })
                 .Element("class/dynamic-component/dynamic-component").Exists();
         }
 
@@ -125,7 +154,10 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
-                    m.DynamicComponent(x => x.ExtensionData, c => { }))
+                {
+                    m.Id(x => x.Id);
+                    m.DynamicComponent(x => x.ExtensionData, c => { });
+                })
                 .Element("class/dynamic-component").HasAttribute("name", "ExtensionData");
         }
 
@@ -134,8 +166,11 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
-                        c.ParentReference(x => x["Parent"])))
+                        c.ParentReference(x => x["Parent"]));
+                })
                 .Element("class/dynamic-component/parent").HasAttribute("name", "Parent");
         }
 
@@ -144,10 +179,13 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
                     {
                         c.Insert();
-                    }))
+                    });
+                })
                 .Element("class/dynamic-component").HasAttribute("insert", "true");
         }
 
@@ -156,10 +194,13 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
         {
             new MappingTester<PropertyTarget>()
                 .ForMapping(m =>
+                {
+                    m.Id(x => x.Id);
                     m.DynamicComponent(x => x.ExtensionData, c =>
                     {
                         c.Update();
-                    }))
+                    });
+                })
                 .Element("class/dynamic-component").HasAttribute("update", "true");
         }
     }
