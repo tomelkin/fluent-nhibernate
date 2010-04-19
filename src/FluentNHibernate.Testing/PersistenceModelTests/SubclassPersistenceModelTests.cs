@@ -23,6 +23,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
 
             classMapping.Subclasses.Count().ShouldEqual(1);
             classMapping.Subclasses.First().Type.ShouldEqual(typeof(TablePerSubclass.TPS_Child));
+            classMapping.Subclasses.First().SubclassType.ShouldEqual(SubclassType.JoinedSubclass);
         }
 
         [Test]
@@ -43,9 +44,11 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
             var child = classMapping.Subclasses.First();
 
             child.Type.ShouldEqual(typeof(TablePerSubclass.TPS_Child));
+            child.SubclassType.ShouldEqual(SubclassType.JoinedSubclass);
 
             child.Subclasses.Count().ShouldEqual(1);
             child.Subclasses.First().Type.ShouldEqual(typeof(TablePerSubclass.TPS_ChildChild));
+            child.Subclasses.First().SubclassType.ShouldEqual(SubclassType.JoinedSubclass);
         }
 
         [Test]

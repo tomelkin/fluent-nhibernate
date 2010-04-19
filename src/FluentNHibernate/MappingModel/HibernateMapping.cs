@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Visitors;
 
@@ -10,6 +10,7 @@ namespace FluentNHibernate.MappingModel
     public class HibernateMapping : MappingBase
     {
         private readonly IList<ClassMapping> classes;
+        private readonly IList<SubclassMapping> subclasses;
         private readonly IList<FilterDefinitionMapping> filters;
         private readonly IList<ImportMapping> imports;
         private readonly AttributeStore<HibernateMapping> attributes;
@@ -22,6 +23,7 @@ namespace FluentNHibernate.MappingModel
         {
             attributes = new AttributeStore<HibernateMapping>(underlyingStore);
             classes = new List<ClassMapping>();
+            subclasses = new List<SubclassMapping>();
             filters = new List<FilterDefinitionMapping>();
             imports = new List<ImportMapping>();
 
@@ -41,28 +43,46 @@ namespace FluentNHibernate.MappingModel
             foreach (var classMapping in Classes)
                 visitor.Visit(classMapping);
 
+            foreach (var subclass in Subclasses)
+                visitor.Visit(subclass);
+
             foreach (var filterMapping in Filters)
                 visitor.Visit(filterMapping);
         }
 
         public IEnumerable<ClassMapping> Classes
         {
-            get { return classes; }
+            get { return classes.ToArray(); }
+        }
+
+        public IEnumerable<SubclassMapping> Subclasses
+        {
+            get { return subclasses.ToArray(); }
         }
 
         public IEnumerable<FilterDefinitionMapping> Filters
         {
-            get { return filters; }
+            get { return filters.ToArray(); }
         }
 
         public IEnumerable<ImportMapping> Imports
         {
-            get { return imports; }
+            get { return imports.ToArray(); }
         }
 
         public void AddClass(ClassMapping classMapping)
         {
             classes.Add(classMapping);            
+        }
+
+        public void AddSubclass(SubclassMapping subclassMapping)
+        {
+            subclasses.Add(subclassMapping);
+        }
+
+        public void RemoveSubclass(SubclassMapping subclassMapping)
+        {
+            subclasses.Remove(subclassMapping);
         }
 
         public void AddFilter(FilterDefinitionMapping filterMapping)
@@ -143,6 +163,7 @@ namespace FluentNHibernate.MappingModel
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return other.classes.ContentEquals(classes) &&
+                other.subclasses.ContentEquals(subclasses) &&
                 other.filters.ContentEquals(filters) &&
                 other.imports.ContentEquals(imports) &&
                 Equals(other.attributes, attributes);

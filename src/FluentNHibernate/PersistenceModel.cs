@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Xml;
+using FluentNHibernate.Cfg;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
@@ -13,7 +15,7 @@ using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Output;
 using FluentNHibernate.Utils;
 using FluentNHibernate.Visitors;
-using NHibernate.Cfg;
+using Configuration = NHibernate.Cfg.Configuration;
 
 namespace FluentNHibernate
 {
@@ -53,7 +55,16 @@ namespace FluentNHibernate
                 var document = serializer.Serialize(mapping);
 
                 if (cfg.GetClassMapping(mapping.Classes.First().Type) == null)
-                    cfg.AddDocument(document);
+                {
+                    try
+                    {
+                        cfg.AddDocument(document);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new FluentConfigurationException("Error adding mapping.", ex);
+                    }
+                }
             }
         }
     }
@@ -76,8 +87,7 @@ namespace FluentNHibernate
         {
             var mappings = CompileProviders(instructions.Sources);
 
-            instructions
-                .Visitors
+            instructions.Visitors
                 .Each(x => x.Visit(mappings));
 
             return mappings;
@@ -214,7 +224,7 @@ namespace FluentNHibernate
             {
                 return new IMappingModelVisitor[]
                 {
-                    new SeparateSubclassVisitor(new List<IIndeterminateSubclassMappingProvider>()),
+                    new SeparateSubclassVisitor(),
                     new ComponentReferenceResolutionVisitor(new IExternalComponentMappingProvider[0]),
                     new ComponentColumnPrefixVisitor(),
                     new BiDirectionalManyToManyPairingVisitor((a,b,c) => {}),

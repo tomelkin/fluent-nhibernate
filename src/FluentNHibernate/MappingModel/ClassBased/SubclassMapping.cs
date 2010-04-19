@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq.Expressions;
+using FluentNHibernate.Utils;
 using FluentNHibernate.Visitors;
 
 namespace FluentNHibernate.MappingModel.ClassBased
 {
-    public class SubclassMapping : ClassMappingBase
+    public class SubclassMapping : ClassMappingBase, ITopMapping
     {
         public SubclassType SubclassType { get; private set; }
         private AttributeStore<SubclassMapping> attributes;
@@ -29,6 +30,12 @@ namespace FluentNHibernate.MappingModel.ClassBased
         {
             get { return attributes.Get(x => x.Extends); }
             set { attributes.Set(x => x.Extends, value); }
+        }
+
+        public void ChangeSubclassType(SubclassType type)
+        {
+            SubclassType = type;
+            Subclasses.Each(x => x.ChangeSubclassType(type));
         }
 
         public override void AcceptVisitor(IMappingModelVisitor visitor)
@@ -190,6 +197,11 @@ namespace FluentNHibernate.MappingModel.ClassBased
                     return (base.GetHashCode() * 397) ^ (attributes != null ? attributes.GetHashCode() : 0);
                 }
             }
+        }
+
+        public void AddTo(HibernateMapping hbm)
+        {
+            hbm.AddSubclass(this);
         }
     }
 }

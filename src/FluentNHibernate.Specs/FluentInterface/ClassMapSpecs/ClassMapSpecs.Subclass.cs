@@ -11,7 +11,12 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
 #pragma warning disable 612,618
 
         Because of = () =>
-            class_mapping = map_as_class<SuperTarget>(m => m.DiscriminateSubClassesOnColumn("col").SubClass<ChildTarget>(sc => { }));
+            class_mapping = map_as_class<SuperTarget>(m =>
+            {
+                m.Id(x => x.Id);
+                m.DiscriminateSubClassesOnColumn("col")
+                    .SubClass<ChildTarget>(sc => { });
+            });
 
 #pragma warning restore 612,618
 

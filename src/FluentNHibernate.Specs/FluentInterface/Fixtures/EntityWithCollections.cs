@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Iesi.Collections.Generic;
 
 namespace FluentNHibernate.Specs.FluentInterface.Fixtures
@@ -10,11 +11,13 @@ namespace FluentNHibernate.Specs.FluentInterface.Fixtures
         public ISet<EntityCollectionChild> SetOfChildren { get; set; }
 
         public IList<string> BagOfStrings { get; set; }
+        public int Id { get; set; }
     }
 
     class EntityWithFieldCollections
     {
         public IList<EntityCollectionChild> BagOfChildren;
+        public int Id { get; set; }
     }
 
     class EntityCollectionChild

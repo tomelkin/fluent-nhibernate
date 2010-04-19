@@ -330,19 +330,6 @@ namespace FluentNHibernate.Testing
 
             injector.Inject(cfg);
         }
-
-        public static ClassMapping GetClassMapping(this IProvider provider)
-        {
-            var instructions = new PersistenceInstructions();
-
-            instructions.AddSource(new StubProviderSource(provider));
-
-            var compiler = new MappingCompiler(instructions);
-
-            return compiler.BuildMappings()
-                .SelectMany(x => x.Classes)
-                .First();
-        }
     }
 
     public class StubProviderSource : IProviderSource

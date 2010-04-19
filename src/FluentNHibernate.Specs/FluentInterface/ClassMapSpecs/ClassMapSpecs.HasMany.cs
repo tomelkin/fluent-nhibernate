@@ -8,7 +8,11 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
     public class when_class_map_is_told_to_map_a_has_many_bag : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_class<EntityWithCollections>(m => m.HasMany(x => x.BagOfChildren));
+            mapping = map_as_class<EntityWithCollections>(m =>
+            {
+                m.Id(x => x.Id);
+                m.HasMany(x => x.BagOfChildren);
+            });
 
         Behaves_like<ClasslikeBagBehaviour> a_bag_in_a_classlike_mapping;
 
@@ -21,7 +25,11 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
     public class when_class_map_is_told_to_map_a_has_many_set : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_class<EntityWithCollections>(m => m.HasMany(x => x.SetOfChildren));
+            mapping = map_as_class<EntityWithCollections>(m =>
+            {
+                m.Id(x => x.Id);
+                m.HasMany(x => x.SetOfChildren);
+            });
 
         Behaves_like<ClasslikeSetBehaviour> a_set_in_a_classlike_mapping;
 
@@ -31,7 +39,11 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
     public class when_class_map_is_told_to_map_a_has_many_list_with_default_index : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_class<EntityWithCollections>(m => m.HasMany(x => x.BagOfChildren).AsList());
+            mapping = map_as_class<EntityWithCollections>(m =>
+            {
+                m.Id(x => x.Id);
+                m.HasMany(x => x.BagOfChildren).AsList();
+            });
 
         Behaves_like<ClasslikeListWithDefaultIndexBehaviour> a_list_with_the_default_index_in_a_classlike_mapping;
 
@@ -41,11 +53,15 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
     public class when_class_map_is_told_to_map_a_has_many_list_with_custom_index : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_class<EntityWithCollections>(m => m.HasMany(x => x.BagOfChildren).AsList(x =>
+            mapping = map_as_class<EntityWithCollections>(m =>
             {
-                x.Column("custom-column");
-                x.Type<IndexTarget>();
-            }));
+                m.Id(x => x.Id);
+                m.HasMany(x => x.BagOfChildren).AsList(x =>
+                {
+                    x.Column("custom-column");
+                    x.Type<IndexTarget>();
+                });
+            });
 
         Behaves_like<ClasslikeListWithCustomIndexBehaviour> a_list_with_a_custom_index_in_a_classlike_mapping;
 
@@ -55,7 +71,11 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
     public class when_class_map_is_told_to_map_a_has_many_array : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_class<EntityWithCollections>(m => m.HasMany(x => x.ArrayOfChildren).AsArray(x => x.Position));
+            mapping = map_as_class<EntityWithCollections>(m =>
+            {
+                m.Id(x => x.Id);
+                m.HasMany(x => x.ArrayOfChildren).AsArray(x => x.Position);
+            });
 
         Behaves_like<ClasslikeArrayBehaviour> an_array_in_a_classlike_mapping;
 
@@ -65,7 +85,11 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
     public class when_class_map_is_told_to_map_an_has_many_from_a_field : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_class<EntityWithFieldCollections>(m => m.HasMany(x => x.BagOfChildren));
+            mapping = map_as_class<EntityWithFieldCollections>(m =>
+            {
+                m.Id(x => x.Id);
+                m.HasMany(x => x.BagOfChildren);
+            });
 
         Behaves_like<ClasslikeBagBehaviour> a_bag_in_a_classlike_mapping;
 
@@ -78,7 +102,11 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
     public class when_class_map_is_told_to_map_an_has_many_using_reveal : ProviderSpec
     {
         Because of = () =>
-            mapping = map_as_class<EntityWithCollections>(m => m.HasMany<ChildTarget>(Reveal.Property<EntityWithCollections>("BagOfChildren")));
+            mapping = map_as_class<EntityWithCollections>(m =>
+            {
+                m.Id(x => x.Id);
+                m.HasMany<ChildTarget>(Reveal.Property<EntityWithCollections>("BagOfChildren"));
+            });
 
         Behaves_like<ClasslikeBagBehaviour> a_bag_in_a_classlike_mapping;
 

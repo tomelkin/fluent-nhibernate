@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentNHibernate.Mapping.Providers;
+using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils;
 
@@ -9,60 +9,70 @@ namespace FluentNHibernate.Visitors
 {
     public class SeparateSubclassVisitor : DefaultMappingModelVisitor
     {
-        private readonly IList<IIndeterminateSubclassMappingProvider> subclassProviders;
+        List<ClassMapping> classes;
+        List<SubclassMapping> subclasses;
+        HibernateMapping currentHibernateMapping;
 
-        public SeparateSubclassVisitor(IList<IIndeterminateSubclassMappingProvider> subclassProviders)
+        public override void ProcessHibernateMapping(HibernateMapping hibernateMapping)
         {
-            this.subclassProviders = subclassProviders;
+            currentHibernateMapping = hibernateMapping;
+            classes = hibernateMapping.Classes.ToList();
+            subclasses = hibernateMapping.Subclasses.ToList();
+
+            subclasses.Each(PairSubclass);
+            classes.Each(PairClass);
         }
 
-        public override void ProcessClass(ClassMapping mapping)
+        void PairClass(ClassMapping mapping)
         {
-            var subclasses = FindClosestSubclasses(mapping.Type);
+            var closestSubclasses = FindClosestSubclasses(mapping.Type);
 
-            foreach (var provider in subclasses)
-                mapping.AddSubclass(provider.GetSubclassMapping(CreateSubclass(mapping)));
+            foreach (var subclass in closestSubclasses)
+            {
+                subclass.ChangeSubclassType(CreateSubclass(mapping));
 
-            base.ProcessClass(mapping);
+                mapping.AddSubclass(subclass);
+                currentHibernateMapping.RemoveSubclass(subclass);
+            }
         }
 
-        public override void ProcessSubclass(SubclassMapping mapping)
+        void PairSubclass(SubclassMapping mapping)
         {
-            var subclasses = FindClosestSubclasses(mapping.Type);
+            var closestSubclasses = FindClosestSubclasses(mapping.Type);
 
-            foreach (var provider in subclasses)
-                mapping.AddSubclass(provider.GetSubclassMapping(new SubclassMapping(mapping.SubclassType)));
+            foreach (var subclass in closestSubclasses)
+            {
+                subclass.ChangeSubclassType(mapping.SubclassType);
 
-            base.ProcessSubclass(mapping);
+                mapping.AddSubclass(subclass);
+                currentHibernateMapping.RemoveSubclass(subclass);
+            }
         }
 
-        private IEnumerable<IIndeterminateSubclassMappingProvider> FindClosestSubclasses(Type type)
+        IEnumerable<SubclassMapping> FindClosestSubclasses(Type type)
         {
-            var extendsSubclasses = subclassProviders
-                .Where(x => x.Extends == type);
-            var subclasses = SortByDistanceFrom(type, subclassProviders.Except(extendsSubclasses));
+            var extendsSubclasses = subclasses
+                .Where(x => x.Extends == type);        
+            var distanceSubclasses = SortByDistanceFrom(type, subclasses.Except(extendsSubclasses));
 
-            if (subclasses.Keys.Count == 0 && !extendsSubclasses.Any())
-                return new IIndeterminateSubclassMappingProvider[0];
-            if (subclasses.Keys.Count == 0)
+            if (distanceSubclasses.Keys.Count == 0 && !extendsSubclasses.Any())
+                return new SubclassMapping[0];
+            if (distanceSubclasses.Keys.Count == 0)
                 return extendsSubclasses;
 
-            var lowestDistance = subclasses.Keys.Min();
+            var lowestDistance = distanceSubclasses.Keys.Min();
 
-            return subclasses[lowestDistance].Concat(extendsSubclasses);
+            return distanceSubclasses[lowestDistance].Concat(extendsSubclasses);
         }
 
-        private SubclassMapping CreateSubclass(ClassMapping mapping)
+        SubclassType CreateSubclass(ClassMapping mapping)
         {
-            if (mapping.Discriminator == null)
-                return new SubclassMapping(SubclassType.JoinedSubclass);
-
-            return new SubclassMapping(SubclassType.Subclass);
+            return mapping.Discriminator == null ? SubclassType.JoinedSubclass : SubclassType.Subclass;
         }
 
-        private bool IsMapped(Type type, IEnumerable<IIndeterminateSubclassMappingProvider> providers)
+        bool IsMapped(Type type, IEnumerable<SubclassMapping> providers)
         {
-            return providers.Any(x => x.EntityType == type);
+            return providers.Any(x => x.Type == type);
         }
 
         /// <summary>
@@ -75,15 +85,15 @@ namespace FluentNHibernate.Visitors
         /// hierarchical interface inheritance.
         /// </summary>
         /// <param name="parentType">Starting point, parent type.</param>
-        /// <param name="subProviders">List of subclasses</param>
+        /// <param name="availableSubclasses">List of subclasses</param>
         /// <returns>Dictionary key'd by the distance from the parentType.</returns>
-        private IDictionary<int, IList<IIndeterminateSubclassMappingProvider>> SortByDistanceFrom(Type parentType, IEnumerable<IIndeterminateSubclassMappingProvider> subProviders)
+        IDictionary<int, IList<SubclassMapping>> SortByDistanceFrom(Type parentType, IEnumerable<SubclassMapping> availableSubclasses)
         {
-            var arranged = new Dictionary<int, IList<IIndeterminateSubclassMappingProvider>>();
+            var arranged = new Dictionary<int, IList<SubclassMapping>>();
 
-            foreach (var subclassProvider in subProviders)
+            foreach (var subclass in availableSubclasses)
             {
-                var subclassType = subclassProvider.EntityType;
+                var subclassType = subclass.Type;
                 var level = 0;
 
                 bool implOfParent = parentType.IsInterface
@@ -93,9 +103,9 @@ namespace FluentNHibernate.Visitors
                 if (!implOfParent) continue;
 
                 if (!arranged.ContainsKey(level))
-                    arranged[level] = new List<IIndeterminateSubclassMappingProvider>();
+                    arranged[level] = new List<SubclassMapping>();
 
-                arranged[level].Add(subclassProvider);
+                arranged[level].Add(subclass);
             }
 
             return arranged;
@@ -109,12 +119,12 @@ namespace FluentNHibernate.Visitors
         /// <param name="evalType"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        private bool DistanceFromParentInterface(Type parentType, Type evalType, ref int level)
+        bool DistanceFromParentInterface(Type parentType, Type evalType, ref int level)
         {
             if (!evalType.HasInterface(parentType)) return false;
 
             if (!(evalType == typeof(object)) &&
-                IsMapped(evalType.BaseType, subclassProviders))
+                IsMapped(evalType.BaseType, subclasses))
             {
                 //Walk the tree if the subclasses base class is also in the subclassProviders
                 level++;
@@ -133,7 +143,7 @@ namespace FluentNHibernate.Visitors
         /// <param name="evalType"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        private bool DistanceFromParentBase(Type parentType, Type evalType, ref int level)
+        bool DistanceFromParentBase(Type parentType, Type evalType, ref int level)
         {
             var evalImplementsParent = false;
             if (evalType == parentType)
@@ -144,7 +154,7 @@ namespace FluentNHibernate.Visitors
                 //If the eval class does not inherit the parent but it is included
                 //in the subclassprovides, then the original subclass can not inherit 
                 //directly from the parent.
-                if (IsMapped(evalType, subclassProviders))
+                if (IsMapped(evalType, subclasses))
                     level++;
                 evalImplementsParent = DistanceFromParentBase(parentType, evalType.BaseType, ref level);
             }

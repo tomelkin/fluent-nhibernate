@@ -16,5 +16,10 @@ namespace FluentNHibernate.MappingModel.ClassBased
         {
             return elementName;
         }
+
+        public override string ToString()
+        {
+            return elementName;
+        }
     }
 }
