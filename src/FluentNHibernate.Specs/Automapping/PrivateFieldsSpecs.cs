@@ -8,6 +8,7 @@ using Machine.Specifications;
 
 namespace FluentNHibernate.Specs.Automapping
 {
+    [Ignore]
     public class when_using_the_automapper_to_map_an_entity_that_uses_private_fields_for_storage
     {
         Establish context = () =>

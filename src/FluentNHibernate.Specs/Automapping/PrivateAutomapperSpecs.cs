@@ -6,6 +6,7 @@ using Machine.Specifications;
 
 namespace FluentNHibernate.Specs.Automapping
 {
+    [Ignore]
     public class when_using_the_private_automapper_to_map_a_entity_with_private_fields_starting_with_an_underscore
     {
         Establish context = () =>

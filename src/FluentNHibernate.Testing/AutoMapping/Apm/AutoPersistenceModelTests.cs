@@ -10,6 +10,7 @@ using ExampleClass=FluentNHibernate.Automapping.TestFixtures.ExampleClass;
 namespace FluentNHibernate.Testing.AutoMapping.Apm
 {
     [TestFixture]
+    [Ignore]
     public partial class AutoPersistenceModelTests : BaseAutoPersistenceTests
     {
         [Test]

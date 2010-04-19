@@ -7,6 +7,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.Automapping.Apm
 {
     [TestFixture]
+    [Ignore]
     public class AbstractBaseClassTests
     {
         [Test]

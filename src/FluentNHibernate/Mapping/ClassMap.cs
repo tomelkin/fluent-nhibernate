@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using FluentNHibernate.Automapping;
 using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
@@ -34,6 +35,7 @@ namespace FluentNHibernate.Mapping
         private readonly PolymorphismBuilder<ClassMap<T>> polymorphism;
         private SchemaActionBuilder<ClassMap<T>> schemaAction;
         protected TuplizerMapping tuplizerMapping;
+        AutomappingEntitySetup automapping;
 
         public ClassMap()
         {
@@ -43,7 +45,7 @@ namespace FluentNHibernate.Mapping
             Cache = new CachePart(typeof(T));
         }
 
-        ITopMapping IProvider.GetMapping()
+        IMappingAction IProvider.GetAction()
         {
 		    var mapping = new ClassMapping(attributes.CloneInner());
 
@@ -103,7 +105,10 @@ namespace FluentNHibernate.Mapping
 
             mapping.Tuplizer = tuplizerMapping;
 
-            return mapping;
+            if (automapping != null)
+                return new AutomapAction(mapping);
+
+            return new ManualAction(mapping);
         }
 
         private string GetDefaultTableName()
@@ -482,6 +487,43 @@ namespace FluentNHibernate.Mapping
             tuplizerMapping.Mode = mode;
             tuplizerMapping.Type = new TypeReference(tuplizerType);
 
+            return this;
+        }
+
+        public AutomappingEntityBuilder AutoMap
+        {
+            get { return new AutomappingEntityBuilder(automapping ?? (automapping = new AutomappingEntitySetup()));}
+        }
+    }
+
+    public class AutomappingEntitySetup
+    {
+        public IAutomappingConfiguration Configuration { get; set; }
+    }
+
+    public class AutomappingEntityBuilder
+    {
+        readonly AutomappingEntitySetup setup;
+
+        public AutomappingEntityBuilder(AutomappingEntitySetup setup)
+        {
+            this.setup = setup;
+        }
+
+        public AutomappingEntityBuilder This()
+        {
+            return this;
+        }
+
+        public AutomappingEntityBuilder UsingConfiguration<T>()
+            where T : IAutomappingConfiguration, new()
+        {
+            return UsingConfiguration(new T());
+        }
+
+        public AutomappingEntityBuilder UsingConfiguration(IAutomappingConfiguration cfg)
+        {
+            setup.Configuration = cfg;
             return this;
         }
     }

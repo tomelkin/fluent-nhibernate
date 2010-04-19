@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
@@ -125,7 +126,7 @@ namespace FluentNHibernate.Automapping
             return membersMapped;
         }
 
-        public ITopMapping GetMapping()
+        public IMappingAction GetAction()
         {
             throw new NotImplementedException();
         }

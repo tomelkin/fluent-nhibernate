@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
@@ -51,7 +52,7 @@ namespace FluentNHibernate.Mapping
             get { return typeof(T); }
         }
 
-        public ITopMapping GetMapping()
+        public IMappingAction GetAction()
         {
             throw new NotImplementedException();
         }

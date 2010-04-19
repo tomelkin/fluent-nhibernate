@@ -8,6 +8,7 @@ using Machine.Specifications;
 
 namespace FluentNHibernate.Specs.Automapping
 {
+    [Ignore]
     public class when_the_automapper_is_told_to_map_a_single_type
     {
         Because of = () =>
@@ -39,6 +40,7 @@ namespace FluentNHibernate.Specs.Automapping
         static XmlDocument xml;
     }
 
+    [Ignore]
     public class when_the_automapper_is_ran_to_completion
     {
         Establish context = () =>

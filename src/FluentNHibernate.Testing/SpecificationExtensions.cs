@@ -351,7 +351,10 @@ namespace FluentNHibernate.Testing
 
         public CompilationResult Compile(IMappingCompiler mappingCompiler)
         {
-            return new CompilationResult(providers.Select(x => x.GetMapping()));
+            var actions = providers.Select(x => x.GetAction());
+            var mappings = actions.Select(x => x.Execute(mappingCompiler));
+
+            return new CompilationResult(mappings);
         }
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel;
@@ -16,11 +17,6 @@ namespace FluentNHibernate.Automapping
         public AutoJoinedSubClassPart(string keyColumn)
             : base(keyColumn)
         {}
-
-        //public object GetMapping()
-        //{
-        //    return ((ISubclassMappingProvider)this).GetSubclassMapping();
-        //}
 
         void IAutoClasslike.DiscriminateSubClassesOnColumn(string column)
         {
@@ -125,7 +121,7 @@ namespace FluentNHibernate.Automapping
             return membersMapped;
         }
 
-        public ITopMapping GetMapping()
+        public IMappingAction GetAction()
         {
             throw new NotImplementedException();
         }

@@ -2,11 +2,34 @@ using System.Linq;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
+using FluentNHibernate.MappingModel.Identity;
 using FluentNHibernate.Specs.FluentInterface.Fixtures;
 using Machine.Specifications;
 
 namespace FluentNHibernate.Specs.FluentInterface
 {
+    [Behaviors]
+    public class ClasslikeIdBehaviour
+    {
+        protected static ClassMapping mapping;
+
+        It should_add_an_id_mapping_to_the_the_class_mapping = () =>
+        {
+            mapping.Id.ShouldNotBeNull();
+            mapping.Id.ShouldBeOfType<IdMapping>();
+        };
+
+        It should_create_an_id_mapping_with_correct_name = () =>
+            mapping.Id.As<IdMapping>().Name.ShouldEqual("Id");
+
+        It should_have_only_one_column_that_has_the_same_name_as_the_property = () =>
+        {
+            mapping.Id.As<IdMapping>().Columns.Count().ShouldEqual(1);
+            mapping.Id.As<IdMapping>().Columns.First().Name.ShouldEqual("Id");
+        };
+    }
+
+
     [Behaviors]
     public class ClasslikePropertyBehaviour
     {

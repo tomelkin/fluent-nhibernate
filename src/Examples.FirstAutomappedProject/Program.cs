@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Examples.FirstAutomappedProject.Entities;
+using FluentNHibernate;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
@@ -10,6 +11,33 @@ using NHibernate.Tool.hbm2ddl;
 
 namespace Examples.FirstAutomappedProject
 {
+    public class ExamplePersistenceModel : PersistenceModel
+    {
+        public ExamplePersistenceModel()
+        {
+            AutoMap.ThisAssembly()
+                .UsingConfiguration<ExampleAutomappingConfiguration>();
+
+            Database(SQLiteConfiguration.Standard.UsingFile(DbFile));
+            PostConfigure(BuildSchema);
+        }
+
+        void BuildSchema(Configuration cfg)
+        {
+            // delete the existing db on each run
+            if (File.Exists(DbFile))
+                File.Delete(DbFile);
+
+            // this NHibernate tool takes a configuration (with mapping info in)
+            // and exports a database schema from it
+            new SchemaExport(cfg)
+                .Create(false, true);
+        }
+
+        const string DbFile = "firstProgram.db";
+    }
+
+
     /// <summary>
     /// Example automapped project.
     /// 

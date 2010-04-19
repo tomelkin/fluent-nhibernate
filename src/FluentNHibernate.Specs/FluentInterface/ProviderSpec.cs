@@ -23,7 +23,25 @@ namespace FluentNHibernate.Specs.FluentInterface
 
             setup(provider);
 
-            return (SubclassMapping)((IProvider)provider).GetMapping();
+            return (SubclassMapping)((IProvider)provider).GetAction();
+        }
+    }
+
+    public abstract class AutomapProviderSpec
+    {
+        public static ClassMapping map_as_class<T>()
+        {
+            return map_as_class<T>(m => {});
+        }
+
+        public static ClassMapping map_as_class<T>(Action<ClassMap<T>> setup)
+        {
+            var provider = new ClassMap<T>();
+
+            provider.AutoMap.This();
+            setup(provider);
+
+            return provider.GetClassMapping();
         }
     }
 }

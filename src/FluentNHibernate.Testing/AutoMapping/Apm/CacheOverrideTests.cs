@@ -5,6 +5,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.AutoMapping.Apm
 {
     [TestFixture]
+    [Ignore]
     public class CacheOverrideTests
     {
         [Test]

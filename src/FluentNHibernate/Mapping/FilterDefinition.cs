@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using NHibernate.Type;
@@ -59,9 +60,9 @@ namespace FluentNHibernate.Mapping
             return mapping;
         }
 
-        public ITopMapping GetMapping()
+        public IMappingAction GetAction()
         {
-            return GetFilterMapping();
+            return new ManualAction(GetFilterMapping());
         }
     }
 }

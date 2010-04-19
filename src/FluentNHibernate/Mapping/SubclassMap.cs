@@ -29,7 +29,7 @@ namespace FluentNHibernate.Mapping
             }
         }
 
-        ITopMapping IProvider.GetMapping()
+        IMappingAction IProvider.GetAction()
         {
             var mapping = new SubclassMapping(SubclassType.Subclass);
 
@@ -70,7 +70,7 @@ namespace FluentNHibernate.Mapping
             foreach (var any in anys)
                 mapping.AddAny(any.GetAnyMapping());
 
-            return mapping;
+            return new ManualAction(mapping);
         }
 
         Type IIndeterminateSubclassMappingProvider.Extends
@@ -82,7 +82,7 @@ namespace FluentNHibernate.Mapping
         {
             foreach (var subclassType in indetermineateSubclasses.Keys)
             {
-                var subclassMapping = (SubclassMapping)indetermineateSubclasses[subclassType].GetMapping();
+                var subclassMapping = (SubclassMapping)indetermineateSubclasses[subclassType].GetAction();
 
                 subclassMapping.ChangeSubclassType(mapping.SubclassType);
 

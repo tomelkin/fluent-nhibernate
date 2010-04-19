@@ -71,8 +71,13 @@
     <Compile Include="Automapping\Fixtures\StubTypeSource.cs" />
     <Compile Include="Automapping\PrivateAutomapperSpecs.cs" />
     <Compile Include="Automapping\PrivateFieldsSpecs.cs" />
+    <Compile Include="Compiler\CompilerSpecs.cs" />
+    <Compile Include="Compiler\Fixtures\Entity.cs" />
+    <Compile Include="Compiler\Fixtures\FullyAutomappedEntity.cs" />
+    <Compile Include="Compiler\MappingCompilerSpec.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FluentInterface\ClasslikeBehaviors.cs" />
+    <Compile Include="FluentInterface\ClassMapSpecs\Automapped.cs" />
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Cache.cs" />
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Component.cs" />
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Discriminator.cs" />
@@ -81,6 +86,7 @@
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Property.cs" />
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Subclass.cs" />
     <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Version.cs" />
+    <Compile Include="FluentInterface\ClassMapSpecs\ClassMapSpecs.Id.cs" />
     <Compile Include="FluentInterface\ComponentMapSpecs.cs" />
     <Compile Include="FluentInterface\Fixtures\EntityWithComponent.cs" />
     <Compile Include="FluentInterface\Fixtures\EntityWithFields.cs" />

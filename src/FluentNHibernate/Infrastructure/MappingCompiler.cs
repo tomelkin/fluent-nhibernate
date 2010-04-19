@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentNHibernate.MappingModel;
+using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils;
 
 namespace FluentNHibernate.Infrastructure
 {
     public interface IMappingCompiler
     {
-        IEnumerable<HibernateMapping> BuildMappings();
+        ITopMapping AutoMap(ITopMapping mapping);
+        ITopMapping ManualMap(ITopMapping mapping);
     }
 
     public class MappingCompiler : IMappingCompiler
@@ -38,6 +41,18 @@ namespace FluentNHibernate.Infrastructure
             topMappings.Each(x => x.AddTo(hbm));
 
             return new[] { hbm };
+        }
+
+        public virtual ITopMapping AutoMap(ITopMapping mapping)
+        {
+            var automapping = instructions.AutomappingInstructions;
+
+            return mapping;
+        }
+
+        public virtual ITopMapping ManualMap(ITopMapping mapping)
+        {
+            return mapping;
         }
     }
 }

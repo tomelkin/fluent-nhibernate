@@ -10,6 +10,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.AutoMapping.Apm
 {
     [TestFixture]
+    [Ignore]
     public class AutoPersistenceModelComponentTests : BaseAutoPersistenceTests
     {
         TestConfiguration_AddressComponent addressCfg;

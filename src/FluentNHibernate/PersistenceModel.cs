@@ -23,6 +23,12 @@ namespace FluentNHibernate
         IDatabaseConfiguration databaseConfiguration;
         Action<Configuration> preConfigure;
         Action<Configuration> postConfigure;
+        AutomappingInstructions automapping;
+
+        public AutomappingBuilder AutoMap
+        {
+            get { return new AutomappingBuilder(automapping ?? (automapping = new AutomappingInstructions())); }
+        }
 
         protected void PreConfigure(Action<Configuration> preConfigureAction)
         {
@@ -137,6 +143,9 @@ namespace FluentNHibernate
 
             if (postConfigure != null)
                 instructions.UsePostConfigureAction(postConfigure);
+
+            if (automapping != null)
+                instructions.UseAutomappingInstructions(automapping);
 
             return instructions;
         }

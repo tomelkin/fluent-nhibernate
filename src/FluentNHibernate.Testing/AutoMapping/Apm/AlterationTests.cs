@@ -7,6 +7,7 @@ using Rhino.Mocks;
 namespace FluentNHibernate.Testing.Automapping.Apm
 {
     [TestFixture]
+    [Ignore]
     public class AlterationTests
     {
         private AutoPersistenceModel model;

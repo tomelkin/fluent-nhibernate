@@ -8,6 +8,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.AutoMapping.Apm.Conventions
 {
     [TestFixture]
+    [Ignore]
     public class VersionConventionTests
     {
         [Test]

@@ -7,6 +7,7 @@ using Machine.Specifications;
 
 namespace FluentNHibernate.Specs.Automapping
 {
+    [Ignore]
     public class when_the_automapper_maps_with_a_property_convention
     {
         Establish context = () =>

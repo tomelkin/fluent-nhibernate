@@ -16,6 +16,7 @@ namespace FluentNHibernate.Infrastructure
         IDatabaseConfiguration Database { get; }
         Action<Configuration> PreConfigure { get; }
         Action<Configuration> PostConfigure { get; }
+        IAutomappingInstructions AutomappingInstructions { get; }
     }
 
     public class PersistenceInstructions : IPersistenceInstructions
@@ -36,6 +37,7 @@ namespace FluentNHibernate.Infrastructure
         public Action<Configuration> PreConfigure { get; private set; }
         public Action<Configuration> PostConfigure { get; private set; }
         public ConventionsCollection Conventions { get; private set; }
+        public IAutomappingInstructions AutomappingInstructions { get; private set; }
 
         public IEnumerable<IMappingModelVisitor> Visitors
         {
@@ -77,6 +79,11 @@ namespace FluentNHibernate.Infrastructure
         public void UsePostConfigureAction(Action<Configuration> postConfigureAction)
         {
             PostConfigure = postConfigureAction;
+        }
+
+        public void UseAutomappingInstructions(IAutomappingInstructions instructions)
+        {
+            AutomappingInstructions = instructions;
         }
     }
 }

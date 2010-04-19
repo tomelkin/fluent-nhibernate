@@ -5,6 +5,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.Automapping
 {
     [TestFixture]
+    [Ignore]
     public class VersionTests : BaseAutoPersistenceTests
     {
         private AutoMappingTester<TEntity> VerifyAutoMap<TEntity>()

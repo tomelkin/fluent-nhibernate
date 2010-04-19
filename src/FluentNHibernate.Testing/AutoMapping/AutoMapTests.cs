@@ -6,6 +6,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.Automapping
 {
     [TestFixture]
+    [Ignore]
     public class AutoMapTests : BaseAutoMapFixture
     {
         [Test]

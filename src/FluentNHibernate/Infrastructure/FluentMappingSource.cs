@@ -19,7 +19,8 @@ namespace FluentNHibernate.Infrastructure
             var compiledMappings = new List<ITopMapping>();
 
             instances
-                .Select(x => x.GetMapping())
+                .Select(x => x.GetAction())
+                .Select(x => x.Execute(mappingCompiler))
                 .Each(compiledMappings.Add);
 
             return new CompilationResult(compiledMappings);

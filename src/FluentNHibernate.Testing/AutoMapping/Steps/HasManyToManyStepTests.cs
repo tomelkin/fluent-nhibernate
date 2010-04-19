@@ -9,6 +9,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.AutoMapping.Steps
 {
     [TestFixture]
+    [Ignore]
     public class HasManyToManyStepTests : BaseAutoMapFixture
     {
         [Test]

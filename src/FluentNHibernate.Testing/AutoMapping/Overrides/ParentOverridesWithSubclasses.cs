@@ -9,6 +9,7 @@ using NUnit.Framework;
 namespace FluentNHibernate.Testing.AutoMapping.Overrides
 {
     [TestFixture]
+    [Ignore]
     public class ParentOverridesWithSubclasses
     {
         [Test]

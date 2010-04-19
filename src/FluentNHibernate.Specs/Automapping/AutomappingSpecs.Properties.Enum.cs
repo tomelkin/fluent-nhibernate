@@ -7,6 +7,7 @@ using Machine.Specifications;
 
 namespace FluentNHibernate.Specs.Automapping
 {
+    [Ignore]
     public class when_the_automapper_is_told_to_map_an_entity_with_static_properties
     {
         Establish context = () =>
@@ -22,6 +23,7 @@ namespace FluentNHibernate.Specs.Automapping
         static ClassMapping mapping;
     }
 
+    [Ignore]
     public class when_the_automapper_is_told_to_map_an_entity_with_a_enum_property : AutomapperEnumPropertySpec
     {
         Establish context = () =>
@@ -40,6 +42,7 @@ namespace FluentNHibernate.Specs.Automapping
             mapping.Properties.First().Columns.ShouldContain(x => x.Name == "EnumProperty");
     }
 
+    [Ignore]
     public class when_the_automapper_is_told_to_map_an_entity_with_a_nullable_enum_property : AutomapperEnumPropertySpec
     {
         Establish context = () =>
