@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace FluentNHibernate
+namespace FluentNHibernate.Infrastructure
 {
     /// <summary>
     /// Facade over an assembly for retrieving type instances.

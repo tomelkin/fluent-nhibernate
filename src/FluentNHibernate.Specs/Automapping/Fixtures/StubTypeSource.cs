@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentNHibernate.Infrastructure;
 
 namespace FluentNHibernate.Specs.Automapping.Fixtures
 {

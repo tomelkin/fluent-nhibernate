@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Helpers;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using NUnit.Framework;
 

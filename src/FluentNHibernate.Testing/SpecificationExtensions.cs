@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using NHibernate.Cfg;
@@ -323,10 +324,12 @@ namespace FluentNHibernate.Testing
                 .BuildMappings();
         }
 
-        public static void Configure(this PersistenceModel model, Configuration cfg)
+        public static void Configure(this IPersistenceInstructionGatherer model, Configuration cfg)
         {
-            var mappings = model.BuildMappings();
-            var injector = new MappingInjector(mappings);
+            var instructions = model.GetInstructions();
+            var mappings = instructions.BuildMappings();
+            var alterations = new ConfigurationAlterations(mappings, instructions);
+            var injector = new ConfigurationModifier(alterations);
 
             injector.Inject(cfg);
         }

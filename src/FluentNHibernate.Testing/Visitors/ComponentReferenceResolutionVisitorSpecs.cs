@@ -1,4 +1,5 @@
-﻿using FluentNHibernate.Mapping.Providers;
+﻿using FluentNHibernate.Infrastructure;
+using FluentNHibernate.Mapping.Providers;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Testing.Utils;
 using FluentNHibernate.Visitors;

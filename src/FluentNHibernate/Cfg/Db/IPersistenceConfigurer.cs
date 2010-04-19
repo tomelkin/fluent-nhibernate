@@ -1,3 +1,4 @@
+using System;
 using NHibernate.Cfg;
 
 namespace FluentNHibernate.Cfg.Db

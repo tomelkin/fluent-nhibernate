@@ -1,115 +1,71 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Xml;
-using FluentNHibernate.Cfg;
+using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions;
-using FluentNHibernate.Mapping.Providers;
-using FluentNHibernate.MappingModel;
-using FluentNHibernate.MappingModel.ClassBased;
-using FluentNHibernate.MappingModel.Output;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Utils;
-using FluentNHibernate.Visitors;
-using Configuration = NHibernate.Cfg.Configuration;
+using NHibernate.Cfg;
 
 namespace FluentNHibernate
 {
-    public interface IPersistenceInstructions
-    {
-        IEnumerable<IProviderSource> Sources { get; }
-        ConventionsCollection Conventions { get; }
-        IEnumerable<IMappingModelVisitor> Visitors { get; }
-    }
-
-    public interface IPersistenceInstructionGatherer
-    {
-        IPersistenceInstructions GetInstructions();
-    }
-
-    public class MappingInjector
-    {
-        readonly IEnumerable<HibernateMapping> mappings;
-
-        public MappingInjector(IEnumerable<HibernateMapping> mappings)
-        {
-            this.mappings = mappings;
-        }
-
-        public void Inject(Configuration cfg)
-        {
-            foreach (var mapping in mappings.Where(m => m.Classes.Count() == 0))
-            {
-                var serializer = new MappingXmlSerializer();
-                var document = serializer.Serialize(mapping);
-                cfg.AddDocument(document);
-            }
-
-            foreach (var mapping in mappings.Where(m => m.Classes.Count() > 0))
-            {
-                var serializer = new MappingXmlSerializer();
-                var document = serializer.Serialize(mapping);
-
-                if (cfg.GetClassMapping(mapping.Classes.First().Type) == null)
-                {
-                    try
-                    {
-                        cfg.AddDocument(document);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new FluentConfigurationException("Error adding mapping.", ex);
-                    }
-                }
-            }
-        }
-    }
-
-    public interface IMappingCompiler
-    {
-        
-    }
-
-    public class MappingCompiler : IMappingCompiler
-    {
-        readonly IPersistenceInstructions instructions;
-
-        public MappingCompiler(IPersistenceInstructions instructions)
-        {
-            this.instructions = instructions;
-        }
-
-        public IEnumerable<HibernateMapping> BuildMappings()
-        {
-            var mappings = CompileProviders(instructions.Sources);
-
-            instructions.Visitors
-                .Each(x => x.Visit(mappings));
-
-            return mappings;
-        }
-
-        IEnumerable<HibernateMapping> CompileProviders(IEnumerable<IProviderSource> sources)
-        {
-            var topMappings = sources
-                .SelectMany(x => x.Compile(this).CompiledMappings);
-            var hbm = new HibernateMapping();
-
-            topMappings.Each(x => x.AddTo(hbm));
-
-            return new[] { hbm };
-        }
-    }
+    public interface IPersistenceModel
+    {}
 
     public class PersistenceModel : IPersistenceInstructionGatherer
     {
         readonly List<ITypeSource> sources = new List<ITypeSource>();
         readonly List<IProvider> instances = new List<IProvider>();
         readonly ConventionsCollection conventions = new ConventionsCollection();
+        IDatabaseConfiguration databaseConfiguration;
+        Action<Configuration> preConfigure;
+        Action<Configuration> postConfigure;
+
+        protected void PreConfigure(Action<Configuration> preConfigureAction)
+        {
+            preConfigure = preConfigureAction;
+        }
+
+        protected void PostConfigure(Action<Configuration> postConfigureAction)
+        {
+            postConfigure = postConfigureAction;
+        }
+
+        /// <summary>
+        /// Base the PersistenceModel configuration on another PersistenceModel's setup.
+        /// Use this method to "inherit" settings, that can be overwritten in your own
+        /// model.
+        /// </summary>
+        /// <param name="model">PersistenceModel to inherit settings from</param>
+        protected void BaseConfigurationOn(IPersistenceModel model)
+        {
+            
+        }
+
+        /// <summary>
+        /// Extend the PersistenceModel configuration with another PersistenceModel's setup.
+        /// Use this method to apply existing settings "on top" of your own settings. Good
+        /// for if you want to pass in a "test" configuration that just alters minor settings but
+        /// keeps everything else intact.
+        /// </summary>
+        /// <param name="model">PersistenceModel to extend your own with</param>
+        protected void ExtendConfigurationWith(IPersistenceModel model)
+        {
+            
+        }
+
+        protected void Database(IPersistenceConfigurer db)
+        {
+            databaseConfiguration = new PreconfiguredDatabaseConfiguration(db);
+        }
+
+        protected void Database(IDatabaseConfiguration dbCfg)
+        {
+            databaseConfiguration = dbCfg;
+        }
 
         public IConventionContainer Conventions
         {
@@ -144,14 +100,14 @@ namespace FluentNHibernate
 
         private static Assembly FindTheCallingAssembly()
         {
-            StackTrace trace = new StackTrace(Thread.CurrentThread, false);
+            var trace = new StackTrace(Thread.CurrentThread, false);
 
-            Assembly thisAssembly = Assembly.GetExecutingAssembly();
+            var thisAssembly = Assembly.GetExecutingAssembly();
             Assembly callingAssembly = null;
-            for (int i = 0; i < trace.FrameCount; i++)
+            for (var i = 0; i < trace.FrameCount; i++)
             {
-                StackFrame frame = trace.GetFrame(i);
-                Assembly assembly = frame.GetMethod().DeclaringType.Assembly;
+                var frame = trace.GetFrame(i);
+                var assembly = frame.GetMethod().DeclaringType.Assembly;
                 if (assembly != thisAssembly)
                 {
                     callingAssembly = assembly;
@@ -173,6 +129,15 @@ namespace FluentNHibernate
             instructions.AddSource(new FluentMappingSource(mappingProviders));
             instructions.UseConventions(conventions);
 
+            if (databaseConfiguration != null)
+                instructions.UseDatabaseConfiguration(databaseConfiguration);
+
+            if (preConfigure != null)
+                instructions.UsePreConfigureAction(preConfigure);
+
+            if (postConfigure != null)
+                instructions.UsePostConfigureAction(postConfigure);
+
             return instructions;
         }
 
@@ -184,106 +149,6 @@ namespace FluentNHibernate
                 .Where(x => x.HasInterface<IProvider>())
                 .Select(x => x.InstantiateUsingParameterlessConstructor())
                 .Cast<IProvider>();
-        }
-
-        class SingleTypeSource : ITypeSource
-        {
-            readonly Type type;
-
-            public SingleTypeSource(Type type)
-            {
-                this.type = type;
-            }
-
-            public IEnumerable<Type> GetTypes()
-            {
-                return new[] {type};
-            }
-        }
-    }
-
-    public class PersistenceInstructions : IPersistenceInstructions
-    {
-        readonly List<IProviderSource> sources = new List<IProviderSource>();
-
-        public PersistenceInstructions()
-        {
-            Conventions = new ConventionsCollection();
-        }
-
-        public IEnumerable<IProviderSource> Sources
-        {
-            get { return sources; }
-        }
-
-        public ConventionsCollection Conventions { get; private set; }
-        
-        public IEnumerable<IMappingModelVisitor> Visitors
-        {
-            get
-            {
-                return new IMappingModelVisitor[]
-                {
-                    new SeparateSubclassVisitor(),
-                    new ComponentReferenceResolutionVisitor(new IExternalComponentMappingProvider[0]),
-                    new ComponentColumnPrefixVisitor(),
-                    new BiDirectionalManyToManyPairingVisitor((a,b,c) => {}),
-                    new ManyToManyTableNameVisitor(),
-                    new ConventionVisitor(new ConventionFinder(Conventions)),
-                    new ValidationVisitor()
-                };
-            }
-        }
-
-        public void AddSource(IProviderSource source)
-        {
-            sources.Add(source);
-        }
-
-        public void UseConventions(ConventionsCollection collection)
-        {
-            Conventions = collection;
-        }
-    }
-
-    public class FluentMappingSource : IProviderSource
-    {
-        readonly IEnumerable<IProvider> instances;
-
-        public FluentMappingSource(IEnumerable<IProvider> instances)
-        {
-            this.instances = instances;
-        }
-
-        public CompilationResult Compile(IMappingCompiler mappingCompiler)
-        {
-            var compiledMappings = new List<ITopMapping>();
-
-            instances
-                .Select(x => x.GetMapping())
-                .Each(compiledMappings.Add);
-
-            return new CompilationResult(compiledMappings);
-        }
-    }
-
-    public interface IProvider
-    {
-        ITopMapping GetMapping();
-    }
-
-    public class PassThroughMappingProvider : IProvider
-    {
-        private readonly ClassMapping mapping;
-
-        public PassThroughMappingProvider(ClassMapping mapping)
-        {
-            this.mapping = mapping;
-        }
-
-        public ITopMapping GetMapping()
-        {
-            return mapping;
         }
     }
 }

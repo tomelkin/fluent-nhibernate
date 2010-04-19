@@ -1,23 +1,26 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Reflection;
 
-namespace FluentNHibernate
+namespace FluentNHibernate.Infrastructure
 {
-    internal sealed class DummyMethodInfo : MethodInfo
+    public sealed class DummyPropertyInfo : PropertyInfo
     {
         private readonly string name;
         private readonly Type type;
 
-        public DummyMethodInfo(string name, Type type)
+        public DummyPropertyInfo(string name, Type type)
         {
+            if (name == null) throw new ArgumentNullException("name");
+            if (type == null) throw new ArgumentNullException("type");
+
             this.name = name;
             this.type = type;
         }
 
-        public override Type ReturnType
+        public override int MetadataToken
         {
-            get { return type; }
+            get { return name.GetHashCode(); }
         }
 
         public override object[] GetCustomAttributes(bool inherit)
@@ -30,29 +33,34 @@ namespace FluentNHibernate
             throw new NotImplementedException();
         }
 
-        public override ParameterInfo[] GetParameters()
+        public override object GetValue(object obj, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
 
-        public override MethodImplAttributes GetMethodImplementationFlags()
+        public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
 
-        public override object Invoke(object obj, BindingFlags invokeAttr, Binder binder, object[] parameters, CultureInfo culture)
+        public override MethodInfo[] GetAccessors(bool nonPublic)
         {
             throw new NotImplementedException();
         }
 
-        public override MethodInfo GetBaseDefinition()
+        public override MethodInfo GetGetMethod(bool nonPublic)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
-        public override ICustomAttributeProvider ReturnTypeCustomAttributes
+        public override MethodInfo GetSetMethod(bool nonPublic)
         {
-            get { throw new NotImplementedException(); }
+            return null;
+        }
+
+        public override ParameterInfo[] GetIndexParameters()
+        {
+            throw new NotImplementedException();
         }
 
         public override string Name
@@ -70,12 +78,22 @@ namespace FluentNHibernate
             get { throw new NotImplementedException(); }
         }
 
-        public override RuntimeMethodHandle MethodHandle
+        public override Type PropertyType
+        {
+            get { return type; }
+        }
+
+        public override PropertyAttributes Attributes
         {
             get { throw new NotImplementedException(); }
         }
 
-        public override MethodAttributes Attributes
+        public override bool CanRead
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override bool CanWrite
         {
             get { throw new NotImplementedException(); }
         }

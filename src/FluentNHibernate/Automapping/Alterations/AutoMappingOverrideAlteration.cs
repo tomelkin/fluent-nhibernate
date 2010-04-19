@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Utils;
 
 namespace FluentNHibernate.Automapping.Alterations
