@@ -1,4 +1,7 @@
-﻿using FluentNHibernate.MappingModel.ClassBased;
+﻿using System;
+using FluentNHibernate.Infrastructure;
+using FluentNHibernate.MappingModel;
+using FluentNHibernate.MappingModel.ClassBased;
 
 namespace FluentNHibernate.Automapping.Steps
 {
@@ -13,21 +16,23 @@ namespace FluentNHibernate.Automapping.Steps
             collectionStep = new CollectionStep(cfg);
         }
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
-            return simpleTypeCollectionStepStep.ShouldMap(member) ||
-                   collectionStep.ShouldMap(member);
+            return simpleTypeCollectionStepStep.ShouldMap(target, member) ||
+                   collectionStep.ShouldMap(target, member);
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
-            if (property.DeclaringType != classMap.Type)
-                return;
+            //if (property.DeclaringType != classMap.Type)
+            //    return;
 
-            if (simpleTypeCollectionStepStep.ShouldMap(property))
-                simpleTypeCollectionStepStep.Map(classMap, property);
-            else if (collectionStep.ShouldMap(property))
-                collectionStep.Map(classMap, property);
+            if (simpleTypeCollectionStepStep.ShouldMap(target, member))
+                return simpleTypeCollectionStepStep.Map(target, member);
+            if (collectionStep.ShouldMap(target, member))
+                return collectionStep.Map(target, member);
+
+            throw new InvalidOperationException();
         }
     }
 }

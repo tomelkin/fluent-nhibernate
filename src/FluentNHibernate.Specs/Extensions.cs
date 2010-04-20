@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using FluentNHibernate.Automapping;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
@@ -25,7 +27,7 @@ namespace FluentNHibernate.Specs
 
         public static IEnumerable<HibernateMapping> BuildMappings(this IPersistenceInstructions instructions)
         {
-            return new MappingCompiler(instructions)
+            return new MappingCompiler(new AutomapperV2(new ConventionFinder(instructions.Conventions)), instructions)
                 .BuildMappings();
         }
 
@@ -33,27 +35,11 @@ namespace FluentNHibernate.Specs
         {
             var instructions = new PersistenceInstructions();
 
-            instructions.AddSource(new StubProviderSource(provider));
+            instructions.AddActions(provider.GetAction());
 
-            var compiler = new MappingCompiler(instructions);
-
-            return compiler.BuildMappings()
+            return instructions.BuildMappings()
                 .SelectMany(x => x.Classes)
                 .First();
-        }
-
-        public static void AddAction(this PersistenceInstructions instructions, IMappingAction action)
-        {
-            instructions.AddSource(new StubProviderSource(
-                new StubProvider(action)
-            ));
-        }
-
-        public static void AddActions(this PersistenceInstructions instructions, params IMappingAction[] actions)
-        {
-            instructions.AddSource(new StubProviderSource(
-                actions.Select(x => new StubProvider(x)).ToArray()
-            ));
         }
 
         public static ClassMapping BuildMappingFor<T>(this MappingCompiler compiler)
@@ -61,6 +47,16 @@ namespace FluentNHibernate.Specs
             return compiler.BuildMappings()
                 .SelectMany(x => x.Classes)
                 .FirstOrDefault(x => x.Type == typeof(T));
+        }
+
+        public static void AddActions(this PersistenceInstructions instructions, params IProvider[] providers)
+        {
+            instructions.AddActions(providers.Select(x => x.GetAction()));
+        }
+
+        public static void AddActions(this PersistenceInstructions instructions, params IMappingAction[] actions)
+        {
+            instructions.AddActions(actions);
         }
 
         class StubProvider : IProvider
@@ -97,7 +93,7 @@ namespace FluentNHibernate.Specs
 
             public IdMappingTester<T> Of<TMapping>()
             {
-                if (!(mapping is T))
+                if (!(mapping is TMapping))
                     throw new SpecificationException(string.Format("Should have id of {0} but was {1}.", typeof(TMapping).Name, mapping.GetType().Name));
                 return this;
             }
@@ -146,6 +142,14 @@ namespace FluentNHibernate.Specs
         }
     }
 
+    public static class Action
+    {
+        public static PartialAutomapAction For<T>()
+        {
+            return new PartialAutomapAction(Mapping.For<T>());
+        }
+    }
+
     public class StubProviderSource : IProviderSource
     {
         readonly IEnumerable<IProvider> providers;
@@ -163,7 +167,7 @@ namespace FluentNHibernate.Specs
         public CompilationResult Compile(IMappingCompiler mappingCompiler)
         {
             var actions = providers.Select(x => x.GetAction());
-            var mappings = actions.Select(x => x.Execute(mappingCompiler));
+            var mappings = actions.SelectMany(x => mappingCompiler.Compile(x));
 
             return new CompilationResult(mappings);
         }

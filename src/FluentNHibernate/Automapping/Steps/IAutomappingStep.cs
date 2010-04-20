@@ -1,10 +1,12 @@
-﻿using FluentNHibernate.MappingModel.ClassBased;
+﻿using FluentNHibernate.Infrastructure;
+using FluentNHibernate.MappingModel;
+using FluentNHibernate.MappingModel.ClassBased;
 
 namespace FluentNHibernate.Automapping.Steps
 {
     public interface IAutomappingStep
     {
-        bool ShouldMap(Member member);
-        void Map(ClassMappingBase classMap, Member property);
+        bool ShouldMap(AutomappingTarget target, Member member);
+        IMemberMapping Map(AutomappingTarget target, Member member);
     }
 }

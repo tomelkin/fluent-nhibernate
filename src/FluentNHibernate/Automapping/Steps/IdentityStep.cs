@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
@@ -15,22 +16,23 @@ namespace FluentNHibernate.Automapping.Steps
             this.cfg = cfg;
         }
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             return cfg.IsId(member);
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
-            if (!(classMap is ClassMapping)) return;
+            if (!(target.Mapping is ClassMapping)) return null;
 
-            var idMapping = new IdMapping { ContainingEntityType = classMap.Type };
-            idMapping.AddDefaultColumn(new ColumnMapping() { Name = property.Name });
-            idMapping.Name = property.Name;
-            idMapping.Type = new TypeReference(property.PropertyType);
-            idMapping.Member = property;
-            idMapping.SetDefaultValue("Generator", GetDefaultGenerator(property));
-            ((ClassMapping)classMap).Id = idMapping;        
+            var idMapping = new IdMapping { /*ContainingEntityType = classMap.Type*/ };
+            idMapping.AddDefaultColumn(new ColumnMapping() { Name = member.Name });
+            idMapping.Name = member.Name;
+            idMapping.Type = new TypeReference(member.PropertyType);
+            idMapping.Member = member;
+            idMapping.SetDefaultValue("Generator", GetDefaultGenerator(member));
+
+            return idMapping;
         }
 
         private GeneratorMapping GetDefaultGenerator(Member property)

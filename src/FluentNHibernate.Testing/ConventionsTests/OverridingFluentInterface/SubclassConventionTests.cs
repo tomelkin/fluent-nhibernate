@@ -120,7 +120,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.OverridingFluentInterface
         private void VerifyModel(Action<SubclassMapping> modelVerification)
         {
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(mapping, subclassMap));
+            instructions.AddActions(mapping, subclassMap);
             instructions.UseConventions(conventions);
 
             var generatedModels = instructions.BuildMappings();

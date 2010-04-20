@@ -19,7 +19,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
             var autoMap = new ClassMapping();
 
             var mapper = new HasManyToManyStep(new DefaultAutomappingConfiguration());
-            mapper.Map(autoMap, Member);
+            mapper.Map(null, Member);
 
             autoMap.Collections.ShouldHaveCount(1);
         }

@@ -7,6 +7,7 @@ using System.Threading;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
+using FluentNHibernate.Mapping;
 using FluentNHibernate.Utils;
 using NHibernate.Cfg;
 
@@ -23,7 +24,7 @@ namespace FluentNHibernate
         IDatabaseConfiguration databaseConfiguration;
         Action<Configuration> preConfigure;
         Action<Configuration> postConfigure;
-        AutomappingInstructions automapping;
+        IAutomappingInstructions automapping;
 
         public AutomappingBuilder AutoMap
         {
@@ -123,16 +124,31 @@ namespace FluentNHibernate
             return callingAssembly;
         }
 
+        IEnumerable<IMappingAction> GetActions()
+        {
+            var actionsFromInstances = instances.Select(x => x.GetAction());
+            var actionsFromProviders = GetProvidersFromSources().Select(x => x.GetAction());
+            var actionsForAutomapping = automapping.GetTypesToMap().Select(x => new PartialAutomapAction(x));
+
+            // all pre-instantiated providers)
+            foreach (var action in actionsFromInstances)
+                yield return action;
+
+            // all providers found by scanning
+            foreach (var action in actionsFromProviders)
+                yield return action;
+
+            // all types for mapping by the automapper
+            foreach (var action in actionsForAutomapping)
+                yield return action;
+        }
+
         IPersistenceInstructions IPersistenceInstructionGatherer.GetInstructions()
         {
             var instructions = new PersistenceInstructions();
+            var actions = GetActions();
 
-            var mappingProviders = new List<IProvider>();
-
-            mappingProviders.AddRange(instances); // add pre-instantiated maps
-            mappingProviders.AddRange(GetProvidersFromSources());
-
-            instructions.AddSource(new FluentMappingSource(mappingProviders));
+            instructions.AddActions(actions);
             instructions.UseConventions(conventions);
 
             if (databaseConfiguration != null)

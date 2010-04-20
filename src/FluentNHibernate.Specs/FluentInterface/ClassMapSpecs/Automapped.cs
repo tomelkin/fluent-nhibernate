@@ -17,8 +17,8 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
             action = map.As<IProvider>().GetAction();
         };
 
-        It should_return_an_automap_action = () =>
-            action.ShouldBeOfType<AutomapAction>();
+        It should_return_a_partial_automap_action = () =>
+            action.ShouldBeOfType<PartialAutomapAction>();
         
         static ClassMap<EntityWithPrivateProperties> map;
         static IMappingAction action;

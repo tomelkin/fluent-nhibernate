@@ -76,5 +76,20 @@ namespace FluentNHibernate.MappingModel
         {
             hbm.AddFilter(this);
         }
+
+        public IEnumerable<Member> GetUsedMembers()
+        {
+            return new Member[0];
+        }
+
+        public Type Type
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public void AddMappedMember(IMemberMapping mapping)
+        {
+            throw new InvalidOperationException();
+        }
     }
 }

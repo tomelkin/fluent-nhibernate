@@ -29,6 +29,7 @@ namespace FluentNHibernate.Mapping
         {
             var mapping = new VersionMapping(attributes.CloneInner());
 
+            mapping.Member = property;
             mapping.ContainingEntityType = entity;
 
             mapping.SetDefaultValue("Name", property.Name);

@@ -4,7 +4,7 @@ using FluentNHibernate.Visitors;
 
 namespace FluentNHibernate.MappingModel
 {
-    public class OneToOneMapping : MappingBase
+    public class OneToOneMapping : MappingBase, IMemberMapping
     {
         private readonly AttributeStore<OneToOneMapping> attributes;
 
@@ -81,6 +81,7 @@ namespace FluentNHibernate.MappingModel
             set { attributes.Set(x => x.EntityName, value); }
         }
 
+        public Member Member { get; set; }
         public Type ContainingEntityType { get; set; }
 
         public override bool IsSpecified(string property)

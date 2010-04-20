@@ -182,7 +182,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.ApplyingToModel
                 .AsArray(x => x.Id);
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             var generatedModels = instructions.BuildMappings();

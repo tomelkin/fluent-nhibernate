@@ -30,7 +30,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.References(x => x.Parent);
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()
@@ -49,7 +49,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.HasMany(x => x.Children);
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()
@@ -68,7 +68,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.HasManyToMany(x => x.Children);
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()
@@ -87,7 +87,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             classMap.Join("two", m => { });
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()
@@ -106,7 +106,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             var subclassMap = new SubclassMap<ExampleInheritedClass>();
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap, subclassMap));
+            instructions.AddActions(classMap, subclassMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()

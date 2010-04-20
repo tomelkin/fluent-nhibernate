@@ -151,6 +151,7 @@ namespace FluentNHibernate.Mapping
             if (!mapping.IsSpecified("IdType"))
                 throw new InvalidOperationException("<any> mapping is not valid without specifying an IdType");
 
+            mapping.Member = property;
             mapping.ContainingEntityType = entity;
 
             if (!mapping.IsSpecified("Name"))

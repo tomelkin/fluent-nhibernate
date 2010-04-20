@@ -109,7 +109,7 @@ namespace FluentNHibernate.Specs.FluentInterface
             subclass_map.Component(x => x.Component);
 
             instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(class_map, subclass_map, component_map));
+            instructions.AddActions(class_map, subclass_map, component_map);
         };
 
         Because of = () =>
@@ -183,7 +183,7 @@ namespace FluentNHibernate.Specs.FluentInterface
             class_map.Component(x => x.Component);
 
             instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(class_map, component_map));
+            instructions.AddActions(class_map, component_map);
         };
 
         Because of = () =>

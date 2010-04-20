@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 
@@ -12,7 +13,7 @@ namespace FluentNHibernate.Automapping.Steps
             p.PropertyType.Namespace != "Iesi.Collections.Generic" &&
 	    !p.PropertyType.IsEnum);
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             if (member.CanWrite)
                 return findPropertyconvention(member);
@@ -20,10 +21,9 @@ namespace FluentNHibernate.Automapping.Steps
             return false;
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
-            var manyToOne = CreateMapping(property);
-            classMap.AddReference(manyToOne);
+            return CreateMapping(member);
         }
 
         private ManyToOneMapping CreateMapping(Member property)

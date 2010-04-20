@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
@@ -15,7 +16,7 @@ namespace FluentNHibernate.Automapping.Steps
             this.cfg = cfg;
         }
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             var type = member.PropertyType;
             if (type.Namespace != "Iesi.Collections.Generic" &&
@@ -90,15 +91,15 @@ namespace FluentNHibernate.Automapping.Steps
             mapping.SetDefaultValue(x => x.Key, key);
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
-            var inverseProperty = GetInverseProperty(property);
-            var parentSide = cfg.GetParentSideForManyToMany(property.DeclaringType, inverseProperty.DeclaringType);
-            var mapping = GetCollection(property);
+            var inverseProperty = GetInverseProperty(member);
+            var parentSide = cfg.GetParentSideForManyToMany(member.DeclaringType, inverseProperty.DeclaringType);
+            var mapping = GetCollection(member);
 
-            ConfigureModel(property, mapping, classMap, parentSide);
+            //ConfigureModel(property, mapping, classMap, parentSide);
 
-            classMap.AddCollection(mapping);
+            return mapping;
         }
     }
 }

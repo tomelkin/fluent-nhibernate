@@ -79,6 +79,7 @@ namespace FluentNHibernate.MappingModel.Identity
         }
 
         public Type ContainingEntityType { get; set; }
+        public Member Member { get; set; }
 
         public void AddKeyProperty(KeyPropertyMapping mapping)
         {

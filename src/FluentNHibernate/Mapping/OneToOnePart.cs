@@ -30,6 +30,7 @@ namespace FluentNHibernate.Mapping
         {
             var mapping = new OneToOneMapping(attributes.CloneInner());
 
+            mapping.Member = property;
             mapping.ContainingEntityType = entity;
 
             if (!mapping.IsSpecified("Class"))

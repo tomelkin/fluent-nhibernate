@@ -67,7 +67,7 @@ namespace FluentNHibernate.Automapping
             return "Value";
         }
 
-        public virtual IEnumerable<IAutomappingStep> GetMappingSteps(AutoMapper mapper, IConventionFinder conventionFinder)
+        public virtual IEnumerable<IAutomappingStep> GetMappingSteps(IAutomapper mapper, IConventionFinder conventionFinder)
         {
             return new IAutomappingStep[]
             {

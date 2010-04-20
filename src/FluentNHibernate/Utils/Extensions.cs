@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NHibernate.Util;
 
@@ -6,6 +7,11 @@ namespace FluentNHibernate.Utils
 {
     public static class Extensions
     {
+        public static IEnumerable<T> ConcatSingle<T>(this IEnumerable<T> enumerable, T single)
+        {
+            return enumerable.Concat(new[] {single});
+        }
+
         public static bool In<T>(this T instance, params T[] expected)
         {
             return expected.Any(x => instance.Equals(x));

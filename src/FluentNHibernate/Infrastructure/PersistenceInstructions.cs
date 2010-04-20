@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Mapping.Providers;
@@ -10,7 +11,7 @@ namespace FluentNHibernate.Infrastructure
 {
     public interface IPersistenceInstructions
     {
-        IEnumerable<IProviderSource> Sources { get; }
+        IEnumerable<IMappingAction> GetActions();
         ConventionsCollection Conventions { get; }
         IEnumerable<IMappingModelVisitor> Visitors { get; }
         IDatabaseConfiguration Database { get; }
@@ -21,16 +22,12 @@ namespace FluentNHibernate.Infrastructure
 
     public class PersistenceInstructions : IPersistenceInstructions
     {
-        readonly List<IProviderSource> sources = new List<IProviderSource>();
+        readonly List<IMappingAction> actions = new List<IMappingAction>();
 
         public PersistenceInstructions()
         {
             Conventions = new ConventionsCollection();
-        }
-
-        public IEnumerable<IProviderSource> Sources
-        {
-            get { return sources; }
+            AutomappingInstructions = new NullAutomappingInstructions();
         }
 
         public IDatabaseConfiguration Database { get; private set; }
@@ -56,9 +53,21 @@ namespace FluentNHibernate.Infrastructure
             }
         }
 
-        public void AddSource(IProviderSource source)
+        public IEnumerable<IMappingAction> GetActions()
         {
-            sources.Add(source);
+            var partials = actions.Where(x => x is PartialAutomapAction);
+
+            // combined automapping (do it all in one go)
+            yield return AutomapAction.ComposeFrom(partials);
+
+            // completely manual mappings
+            foreach (var action in actions.Except(partials))
+                yield return action;
+        }
+
+        public void AddActions(IEnumerable<IMappingAction> range)
+        {
+            actions.AddRange(range);
         }
 
         public void UseConventions(ConventionsCollection collection)

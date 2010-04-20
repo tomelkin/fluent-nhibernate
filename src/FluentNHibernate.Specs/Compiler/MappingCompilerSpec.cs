@@ -1,4 +1,8 @@
-﻿using FluentNHibernate.Infrastructure;
+﻿using System;
+using System.Collections.Generic;
+using FluentNHibernate.Automapping;
+using FluentNHibernate.Conventions;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel.ClassBased;
 using Machine.Specifications;
 
@@ -9,7 +13,9 @@ namespace FluentNHibernate.Specs.Compiler
         Establish context = () =>
         {
             instructions = new PersistenceInstructions();
-            compiler = new MockCompiler(instructions);
+            compiler = new MockCompiler(
+                new AutomapperV2(new ConventionFinder(instructions.Conventions)),
+                instructions);
         };
 
         protected static MockCompiler compiler;
@@ -18,20 +24,20 @@ namespace FluentNHibernate.Specs.Compiler
 
         protected class MockCompiler : MappingCompiler
         {
-            public MockCompiler(IPersistenceInstructions instructions)
-                : base(instructions)
+            public MockCompiler(IAutomapper automapper, IPersistenceInstructions instructions)
+                : base(automapper, instructions)
             {}
 
-            public override ITopMapping ManualMap(ITopMapping mapping)
+            public override IEnumerable<ITopMapping> ManualMap(ManualAction action)
             {
                 ManualMapCalled = true;
-                return base.ManualMap(mapping);
+                return base.ManualMap(action);
             }
 
-            public override ITopMapping AutoMap(ITopMapping mapping)
+            public override IEnumerable<ITopMapping> AutoMap(AutomapAction action)
             {
                 AutoMapCalled = true;
-                return base.AutoMap(mapping);
+                return base.AutoMap(action);
             }
 
             public bool ManualMapCalled { get; set; }

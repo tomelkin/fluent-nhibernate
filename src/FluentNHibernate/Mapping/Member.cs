@@ -212,6 +212,13 @@ namespace FluentNHibernate
 
     public static class AndAndExtention
     {
+        public static void AndAnd<This>(this This instance, Action<This> evalulate)
+            where This : class
+        {
+            if (instance != null)
+                evalulate(instance);
+        }
+
         public static Return AndAnd<This, Return>(this This instance, Func<This, Return> evaluate)
             where This : class
         {

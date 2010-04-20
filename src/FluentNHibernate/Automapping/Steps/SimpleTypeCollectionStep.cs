@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
@@ -20,7 +21,7 @@ namespace FluentNHibernate.Automapping.Steps
             collections = new AutoCollectionCreator();
         }
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             if (!member.PropertyType.IsGenericType)
                 return false;
@@ -32,21 +33,21 @@ namespace FluentNHibernate.Automapping.Steps
                     (childType.IsPrimitive || childType.In(typeof(string), typeof(DateTime)));
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
-            if (property.DeclaringType != classMap.Type)
-                return;
+            //if (property.DeclaringType != classMap.Type)
+            //    return;
 
-            var mapping = collections.CreateCollectionMapping(property.PropertyType);
+            var mapping = collections.CreateCollectionMapping(member.PropertyType);
 
-            mapping.ContainingEntityType = classMap.Type;
-            mapping.Member = property;
-            mapping.SetDefaultValue(x => x.Name, property.Name);
+            //mapping.ContainingEntityType = classMap.Type;
+            mapping.Member = member;
+            mapping.SetDefaultValue(x => x.Name, member.Name);
 
-            keys.SetKey(property, classMap, mapping);
-            SetElement(property, classMap, mapping);
-        
-            classMap.AddCollection(mapping);
+            //keys.SetKey(property, classMap, mapping);
+            //SetElement(property, classMap, mapping);
+
+            return mapping;
         }
 
         private void SetElement(Member property, ClassMappingBase classMap, ICollectionMapping mapping)

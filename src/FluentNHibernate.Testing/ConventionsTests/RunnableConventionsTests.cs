@@ -673,7 +673,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
         {
             var conventions = new ConventionsCollection {convention};
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(getMapping()));
+            instructions.AddActions(getMapping());
             instructions.UseConventions(conventions);
 
             return instructions.BuildMappings()
@@ -685,7 +685,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
         {
             var conventions = new ConventionsCollection { convention };
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(getMapping()));
+            instructions.AddActions(getMapping());
             instructions.UseConventions(conventions);
 
             return instructions.BuildMappings()

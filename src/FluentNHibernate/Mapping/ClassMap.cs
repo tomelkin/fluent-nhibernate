@@ -106,7 +106,7 @@ namespace FluentNHibernate.Mapping
             mapping.Tuplizer = tuplizerMapping;
 
             if (automapping != null)
-                return new AutomapAction(mapping);
+                return new PartialAutomapAction(mapping);
 
             return new ManualAction(mapping);
         }

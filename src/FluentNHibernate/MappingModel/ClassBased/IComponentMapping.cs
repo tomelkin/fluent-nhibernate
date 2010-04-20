@@ -8,7 +8,7 @@ using FluentNHibernate.Visitors;
 
 namespace FluentNHibernate.MappingModel.ClassBased
 {
-    public interface IComponentMapping
+    public interface IComponentMapping : IMemberMapping
     {
         void AcceptVisitor(IMappingModelVisitor visitor);
         ParentMapping Parent { get; set; }
@@ -17,7 +17,6 @@ namespace FluentNHibernate.MappingModel.ClassBased
         string Access { get; set; }
         Type ContainingEntityType { get; }
         string Name { get; set; }
-        Member Member { get; }
         Type Type { get; }
         bool OptimisticLock { get; set; }
         bool Unique { get; }

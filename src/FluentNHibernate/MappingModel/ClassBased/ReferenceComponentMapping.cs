@@ -115,6 +115,7 @@ namespace FluentNHibernate.MappingModel.ClassBased
         public Member Member
         {
             get { return (mergedComponent == null) ? property : mergedComponent.Member; }
+            set {}
         }
 
         public ParentMapping Parent

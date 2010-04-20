@@ -9,7 +9,7 @@ namespace FluentNHibernate.Specs.Compiler
         : MappingCompilerSpec
     {
         Establish context = () =>
-            instructions.AddAction(new AutomapAction(Mapping.For<Entity>()));
+            instructions.AddActions(new AutomapAction(new[] { Action.For<Entity>() }));
 
         Because of = () =>
             Catch.Exception(() => compiler.BuildMappings());
@@ -22,7 +22,7 @@ namespace FluentNHibernate.Specs.Compiler
         : MappingCompilerSpec
     {
         Establish context = () =>
-            instructions.AddAction(new ManualAction(Mapping.For<Entity>()));
+            instructions.AddActions(new ManualAction(Mapping.For<Entity>()));
 
         Because of = () =>
             Catch.Exception(() => compiler.BuildMappings());
@@ -35,7 +35,7 @@ namespace FluentNHibernate.Specs.Compiler
         : MappingCompilerSpec
     {
         Establish context = () =>
-            instructions.AddAction(new AutomapAction(Mapping.For<FullyAutomappedEntity>()));
+            instructions.AddActions(new AutomapAction(new[] { Action.For<FullyAutomappedEntity>() }));
 
         Because of = () =>
             mapping = compiler.BuildMappingFor<FullyAutomappedEntity>();

@@ -88,7 +88,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.ApplyingToModel
             var subclassMap = new SubclassMap<ExampleInheritedClass>();
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap, subclassMap));
+            instructions.AddActions(classMap, subclassMap);
             instructions.UseConventions(conventions);
 
             var generatedModels = instructions.BuildMappings();

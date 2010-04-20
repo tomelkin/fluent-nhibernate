@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils;
@@ -11,14 +12,14 @@ namespace FluentNHibernate.Automapping.Steps
         private static readonly IList<string> ValidNames = new List<string> { "version", "timestamp" };
         private static readonly IList<Type> ValidTypes = new List<Type> { typeof(int), typeof(long), typeof(TimeSpan), typeof(byte[]) };
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             return ValidNames.Contains(member.Name.ToLowerInvariant()) && ValidTypes.Contains(member.PropertyType);
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member property)
         {
-            if (!(classMap is ClassMapping)) return;
+            //if (!(classMap is ClassMapping)) return;
 
             var version = new VersionMapping
             {
@@ -38,7 +39,7 @@ namespace FluentNHibernate.Automapping.Steps
                 version.UnsavedValue = null;
             }
 
-            ((ClassMapping)classMap).Version = version;
+            return version;
         }
 
         private bool IsSqlTimestamp(Member property)

@@ -1,4 +1,5 @@
-﻿using FluentNHibernate.MappingModel;
+﻿using FluentNHibernate.Infrastructure;
+using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.MappingModel.Collections;
 using FluentNHibernate.Utils;
@@ -18,27 +19,27 @@ namespace FluentNHibernate.Automapping.Steps
             collections = new AutoCollectionCreator();
         }
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             return member.CanWrite &&
                 member.PropertyType.Namespace.In("System.Collections.Generic", "Iesi.Collections.Generic");
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
-            if (property.DeclaringType != classMap.Type)
-                return;
+            //if (property.DeclaringType != classMap.Type)
+            //    return;
 
-            var mapping = collections.CreateCollectionMapping(property.PropertyType);
+            var mapping = collections.CreateCollectionMapping(member.PropertyType);
 
-            mapping.ContainingEntityType = classMap.Type;
-            mapping.Member = property;
-            mapping.SetDefaultValue(x => x.Name, property.Name);
+            //mapping.ContainingEntityType = classMap.Type;
+            mapping.Member = member;
+            mapping.SetDefaultValue(x => x.Name, member.Name);
 
-            SetRelationship(property, classMap, mapping);
-            keys.SetKey(property, classMap, mapping);
+            //SetRelationship(property, classMap, mapping);
+            //keys.SetKey(property, classMap, mapping);
 
-            classMap.AddCollection(mapping);  
+            return mapping;
         }
 
         private void SetRelationship(Member property, ClassMappingBase classMap, ICollectionMapping mapping)

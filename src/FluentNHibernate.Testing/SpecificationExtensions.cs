@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using FluentNHibernate.Automapping;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
+using FluentNHibernate.Utils;
 using NHibernate.Cfg;
 using NUnit.Framework;
 
@@ -320,7 +323,7 @@ namespace FluentNHibernate.Testing
 
         public static IEnumerable<HibernateMapping> BuildMappings(this IPersistenceInstructions instructions)
         {
-            return new MappingCompiler(instructions)
+            return new MappingCompiler(new AutomapperV2(new ConventionFinder(instructions.Conventions)), instructions)
                 .BuildMappings();
         }
 
@@ -332,6 +335,16 @@ namespace FluentNHibernate.Testing
             var injector = new ConfigurationModifier(alterations);
 
             injector.Inject(cfg);
+        }
+
+        public static void AddActions(this PersistenceInstructions instructions, params IMappingAction[] actions)
+        {
+            instructions.AddActions(actions);
+        }
+
+        public static void AddActions(this PersistenceInstructions instructions, params IProvider[] providers)
+        {
+            instructions.AddActions(providers.Select(x => x.GetAction()));
         }
     }
 
@@ -352,7 +365,7 @@ namespace FluentNHibernate.Testing
         public CompilationResult Compile(IMappingCompiler mappingCompiler)
         {
             var actions = providers.Select(x => x.GetAction());
-            var mappings = actions.Select(x => x.Execute(mappingCompiler));
+            var mappings = actions.SelectMany(x => mappingCompiler.Compile(x));
 
             return new CompilationResult(mappings);
         }

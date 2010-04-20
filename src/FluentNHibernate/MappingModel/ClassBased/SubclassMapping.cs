@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using FluentNHibernate.MappingModel.Collections;
 using FluentNHibernate.Utils;
 using FluentNHibernate.Visitors;
 
@@ -202,6 +205,37 @@ namespace FluentNHibernate.MappingModel.ClassBased
         public void AddTo(HibernateMapping hbm)
         {
             hbm.AddSubclass(this);
+        }
+
+        public IEnumerable<Member> GetUsedMembers()
+        {
+            var memberMappings = new List<IMemberMapping>();
+            
+            References.Each(memberMappings.Add);
+            Collections.Each(memberMappings.Add);
+            Properties.Each(memberMappings.Add);
+            Components.Each(memberMappings.Add);
+            OneToOnes.Each(memberMappings.Add);
+            Anys.Each(memberMappings.Add);
+
+            return memberMappings
+                .Select(x => x.Member);
+        }
+
+        public void AddMappedMember(IMemberMapping mapping)
+        {
+            if (mapping is ManyToOneMapping)
+                AddReference((ManyToOneMapping)mapping);
+            if (mapping is ICollectionMapping)
+                AddCollection((ICollectionMapping)mapping);
+            if (mapping is PropertyMapping)
+                AddProperty((PropertyMapping)mapping);
+            if (mapping is IComponentMapping)
+                AddComponent((IComponentMapping)mapping);
+            if (mapping is OneToOneMapping)
+                AddOneToOne((OneToOneMapping)mapping);
+            if (mapping is AnyMapping)
+                AddAny((AnyMapping)mapping);
         }
     }
 }

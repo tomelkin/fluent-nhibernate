@@ -21,7 +21,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         [Test]
         public void ShouldMapByteArray()
         {
-            mapper.ShouldMap(typeof(Target).GetProperty("Version").ToMember()).ShouldBeTrue();
+            mapper.ShouldMap(null, typeof(Target).GetProperty("Version").ToMember()).ShouldBeTrue();
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, typeof(Target).GetProperty("Version").ToMember());
+            mapper.Map(null, typeof(Target).GetProperty("Version").ToMember());
 
             mapping.Version.Type.ShouldEqual(new TypeReference("BinaryBlob"));
         }
@@ -39,9 +39,9 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, typeof(Target).GetProperty("Version").ToMember());
+            mapper.Map(null, typeof(Target).GetProperty("Version").ToMember());
 
-            SpecificationExtensions.ShouldBeTrue(mapping.Version.Columns.All(x => x.SqlType == "timestamp"));
+            mapping.Version.Columns.All(x => x.SqlType == "timestamp").ShouldBeTrue();
         }
 
         [Test]
@@ -49,9 +49,9 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, typeof(Target).GetProperty("Version").ToMember());
+            mapper.Map(null, typeof(Target).GetProperty("Version").ToMember());
 
-            SpecificationExtensions.ShouldBeTrue(mapping.Version.Columns.All(x => x.NotNull == true));
+            mapping.Version.Columns.All(x => x.NotNull == true).ShouldBeTrue();
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, typeof(Target).GetProperty("Version").ToMember());
+            mapper.Map(null, typeof(Target).GetProperty("Version").ToMember());
 
             mapping.Version.UnsavedValue.ShouldEqual(null);
         }
@@ -69,7 +69,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(SubTarget) };
 
-            mapper.Map(mapping, typeof(SubTarget).GetProperty("Version").ToMember());
+            mapper.Map(null, typeof(SubTarget).GetProperty("Version").ToMember());
 
             Assert.That(mapping.Version, Is.Not.Null);
         }
@@ -97,7 +97,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         [Test]
         public void ShouldMapByteArray()
         {
-            mapper.ShouldMap(ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version)).ShouldBeTrue();
+            mapper.ShouldMap(null, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version)).ShouldBeTrue();
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
+            mapper.Map(null, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
 
             mapping.Version.Type.ShouldEqual(new TypeReference("BinaryBlob"));
         }
@@ -115,7 +115,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
+            mapper.Map(null, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
 
             mapping.Version.Columns.All(x => x.SqlType == "timestamp").ShouldBeTrue();
         }
@@ -125,7 +125,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
+            mapper.Map(null, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
 
             mapping.Version.Columns.All(x => x.NotNull == true).ShouldBeTrue();
         }
@@ -135,7 +135,7 @@ namespace FluentNHibernate.Testing.AutoMapping.Steps
         {
             var mapping = new ClassMapping { Type = typeof(Target) };
 
-            mapper.Map(mapping, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
+            mapper.Map(null, ReflectionHelper.GetMember<BaseEntityClass>(x => x.Version));
 
             mapping.Version.UnsavedValue.ShouldEqual(null);
         }

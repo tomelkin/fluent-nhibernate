@@ -3,6 +3,7 @@ using System.Linq;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.AcceptanceCriteria;
 using FluentNHibernate.Conventions.Inspections;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.Mapping;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
@@ -21,7 +22,7 @@ namespace FluentNHibernate.Automapping.Steps
             this.cfg = cfg;
         }
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             if (HasExplicitTypeConvention(member))
                 return true;
@@ -70,31 +71,23 @@ namespace FluentNHibernate.Automapping.Steps
                     || property.PropertyType.IsEnum;
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
-        {
-            classMap.AddProperty(GetPropertyMapping(classMap.Type, property, classMap as ComponentMapping));
-        }
-
-        private PropertyMapping GetPropertyMapping(Type type, Member property, ComponentMapping component)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
             var mapping = new PropertyMapping
             {
-                ContainingEntityType = type,
-                Member = property
+                ContainingEntityType = target.Type,
+                Member = member
             };
 
-            var columnName = property.Name;
+            var columnName = member.Name;
             
-            if (component != null)
-                columnName = cfg.GetComponentColumnPrefix(component.Member) + columnName;
-
             mapping.AddDefaultColumn(new ColumnMapping { Name = columnName });
 
             if (!mapping.IsSpecified("Name"))
                 mapping.Name = mapping.Member.Name;
 
             if (!mapping.IsSpecified("Type"))
-                mapping.SetDefaultValue("Type", GetDefaultType(property));
+                mapping.SetDefaultValue("Type", GetDefaultType(member));
 
             return mapping;
         }
@@ -111,6 +104,5 @@ namespace FluentNHibernate.Automapping.Steps
 
             return type;
         }
-
     }
 }

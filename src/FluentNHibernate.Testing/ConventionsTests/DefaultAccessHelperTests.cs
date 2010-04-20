@@ -19,7 +19,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             
             var conventions = new ConventionsCollection {DefaultAccess.Field()};
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()

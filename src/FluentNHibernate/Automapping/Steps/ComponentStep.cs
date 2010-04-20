@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using FluentNHibernate.Infrastructure;
+using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 
 namespace FluentNHibernate.Automapping.Steps
@@ -6,33 +8,33 @@ namespace FluentNHibernate.Automapping.Steps
     public class ComponentStep : IAutomappingStep
     {
         private readonly IAutomappingConfiguration cfg;
-        private readonly AutoMapper mapper;
+        private readonly IAutomapper mapper;
 
-        public ComponentStep(IAutomappingConfiguration cfg, AutoMapper mapper)
+        public ComponentStep(IAutomappingConfiguration cfg, IAutomapper mapper)
         {
             this.cfg = cfg;
             this.mapper = mapper;
         }
 
-        public bool ShouldMap(Member member)
+        public bool ShouldMap(AutomappingTarget target, Member member)
         {
             return cfg.IsComponent(member.PropertyType);
         }
 
-        public void Map(ClassMappingBase classMap, Member property)
+        public IMemberMapping Map(AutomappingTarget target, Member member)
         {
             var mapping = new ComponentMapping(ComponentType.Component)
             {
-                Name = property.Name,
-                Member = property,
-                ContainingEntityType = classMap.Type,
-                Type = property.PropertyType
+                Name = member.Name,
+                Member = member,
+                //ContainingEntityType = classMap.Type,
+                Type = member.PropertyType
             };
 
-            mapper.FlagAsMapped(property.PropertyType);
-            mapper.MergeMap(property.PropertyType, mapping, new List<Member>());
+            //mapper.FlagAsMapped(property.PropertyType);
+            //mapper.MergeMap(property.PropertyType, mapping, new List<Member>());
 
-            classMap.AddComponent(mapping);
+            return mapping;
         }
     }
 }

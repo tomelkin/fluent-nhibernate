@@ -1,3 +1,5 @@
+using FluentNHibernate.Automapping;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Infrastructure;
 using NHibernate.Cfg;
 
@@ -20,7 +22,8 @@ namespace FluentNHibernate
         {
             // TODO: move this out of an extension method
             var instructions = gatherer.GetInstructions();
-            var compiler = new MappingCompiler(instructions);
+            var automapper = new AutomapperV2(new ConventionFinder(instructions.Conventions));
+            var compiler = new MappingCompiler(automapper, instructions);
             var mappings = compiler.BuildMappings();
             var alterations = new ConfigurationAlterations(mappings, instructions);
             var injector = new ConfigurationModifier(alterations);

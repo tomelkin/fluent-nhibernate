@@ -131,7 +131,7 @@ namespace FluentNHibernate.Testing.PersistenceModelTests
         {
             var instructions = new PersistenceInstructions();
 
-            instructions.AddSource(new StubProviderSource(providers));
+            instructions.AddActions(providers);
 
             return instructions.BuildMappings();
         }

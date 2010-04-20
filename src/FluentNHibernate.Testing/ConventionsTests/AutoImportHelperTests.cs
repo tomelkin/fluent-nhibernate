@@ -23,7 +23,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             };
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()

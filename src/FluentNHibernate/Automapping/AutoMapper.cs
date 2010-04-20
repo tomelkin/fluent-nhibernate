@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentNHibernate.Conventions;
+using FluentNHibernate.Infrastructure;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils;
 
 namespace FluentNHibernate.Automapping
 {
-    public class AutoMapper
+    public class AutoMapper : IAutomapper // only implement this to stop compile errors
     {
         List<AutoMapType> mappingTypes;
         readonly IAutomappingConfiguration cfg;
@@ -115,10 +116,10 @@ namespace FluentNHibernate.Automapping
 
             foreach (var rule in cfg.GetMappingSteps(this, conventionFinder))
             {
-                if (!rule.ShouldMap(member)) continue;
+                if (!rule.ShouldMap(null, member)) continue;
                 if (mappedMembers.Contains(member)) continue;
 
-                rule.Map(mapping, member);
+                rule.Map(null, member); // broken
                 mappedMembers.Add(member);
 
                 break;
@@ -163,6 +164,11 @@ namespace FluentNHibernate.Automapping
             mappingTypes
                 .Where(x => x.Type == type)
                 .Each(x => x.IsMapped = true);
+        }
+
+        public IEnumerable<ITopMapping> Map(IEnumerable<AutomappingTarget> targets)
+        {
+            throw new NotImplementedException();
         }
     }
 }

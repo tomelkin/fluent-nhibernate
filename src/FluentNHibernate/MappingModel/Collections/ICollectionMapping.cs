@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace FluentNHibernate.MappingModel.Collections
 {
-    public interface ICollectionMapping : IMappingBase
+    public interface ICollectionMapping : IMappingBase, IMemberMapping
     {
         CacheMapping Cache { get; set; }
         bool Inverse { get; set; }
@@ -28,7 +28,6 @@ namespace FluentNHibernate.MappingModel.Collections
         bool Generic { get; set; }
         KeyMapping Key { get; set; }
         ICollectionRelationshipMapping Relationship { get; set; }
-        Member Member { get; set;  }
         ElementMapping Element { get; set; }
         CompositeElementMapping CompositeElement { get; set; }
         Type ContainingEntityType { get; set; }

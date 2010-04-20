@@ -72,6 +72,7 @@
     <Compile Include="Automapping\Alterations\AutoMappingOverrideAlteration.cs" />
     <Compile Include="Automapping\Alterations\IAutoMappingAlteration.cs" />
     <Compile Include="Automapping\Alterations\IAutoMappingOverride.cs" />
+    <Compile Include="Automapping\AutomapperV2.cs" />
     <Compile Include="Cfg\Db\IDatabaseConfiguration.cs" />
     <Compile Include="Cfg\Db\PreconfiguredDatabaseConfiguration.cs" />
     <Compile Include="IAutomappingInstructions.cs" />
@@ -105,12 +106,18 @@
     <Compile Include="Automapping\Steps\HasManyToManyStep.cs" />
     <Compile Include="Automapping\Steps\CollectionStep.cs" />
     <Compile Include="Automapping\Steps\IAutomappingStep.cs" />
+    <Compile Include="Infrastructure\AutomapAction.cs" />
+    <Compile Include="Infrastructure\AutomappingTarget.cs" />
     <Compile Include="Infrastructure\CombinedAssemblyTypeSource.cs" />
     <Compile Include="Infrastructure\CompilationResult.cs" />
     <Compile Include="Infrastructure\ConfigurationAlterations.cs" />
     <Compile Include="Infrastructure\ConfigurationModifier.cs" />
     <Compile Include="Conventions\ConventionContainer.cs" />
-    <Compile Include="Infrastructure\FluentMappingSource.cs" />
+    <Compile Include="Infrastructure\EntityAutomappingInstructions.cs" />
+    <Compile Include="Infrastructure\IMappingAction.cs" />
+    <Compile Include="Infrastructure\ManualAction.cs" />
+    <Compile Include="Infrastructure\PartialAutomapAction.cs" />
+    <Compile Include="Infrastructure\ProviderSource.cs" />
     <Compile Include="Infrastructure\IPersistenceInstructionGatherer.cs" />
     <Compile Include="Infrastructure\IProvider.cs" />
     <Compile Include="Infrastructure\IProviderSource.cs" />
@@ -411,6 +418,7 @@
     <Compile Include="MappingModel\ClassBased\ITopMapping.cs" />
     <Compile Include="MappingModel\ClassBased\SubclassType.cs" />
     <Compile Include="MappingModel\EqualityExtensions.cs" />
+    <Compile Include="MappingModel\IMemberMapping.cs" />
     <Compile Include="MappingModel\NaturalIdMapping.cs" />
     <Compile Include="MappingModel\Output\XmlNaturalIdWriter.cs" />
     <Compile Include="Mapping\NaturalIdPart.cs" />

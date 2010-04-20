@@ -48,7 +48,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.ApplyingToModel
                 .KeyReference(x => x.Parent);
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             var generatedModels = instructions.BuildMappings();

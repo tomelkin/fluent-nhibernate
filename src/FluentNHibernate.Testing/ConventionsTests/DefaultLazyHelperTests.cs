@@ -20,7 +20,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             var conventions = new ConventionsCollection {DefaultLazy.Always()};
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()
@@ -37,7 +37,7 @@ namespace FluentNHibernate.Testing.ConventionsTests
             var conventions = new ConventionsCollection {DefaultLazy.Never()};
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             instructions.BuildMappings()

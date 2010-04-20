@@ -86,7 +86,7 @@ namespace FluentNHibernate.Testing.ConventionsTests.ApplyingToModel
             classMap.Join("table", m => {});
 
             var instructions = new PersistenceInstructions();
-            instructions.AddSource(new StubProviderSource(classMap));
+            instructions.AddActions(classMap);
             instructions.UseConventions(conventions);
 
             var generatedModels = instructions.BuildMappings();

@@ -5,9 +5,9 @@ namespace FluentNHibernate
 {
     public class AutomappingBuilder
     {
-        readonly AutomappingInstructions instructions;
+        readonly IAutomappingInstructions instructions;
 
-        public AutomappingBuilder(AutomappingInstructions instructions)
+        public AutomappingBuilder(IAutomappingInstructions instructions)
         {
             this.instructions = instructions;
         }
@@ -25,7 +25,7 @@ namespace FluentNHibernate
 
         public AutomappingBuilder UsingConfiguration(IAutomappingConfiguration cfg)
         {
-            instructions.Configuration = cfg;
+            instructions.UseConfiguration(cfg);
             return this;
         }
     }

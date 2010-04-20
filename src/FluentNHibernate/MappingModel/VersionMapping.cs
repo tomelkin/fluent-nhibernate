@@ -5,7 +5,7 @@ using FluentNHibernate.Visitors;
 
 namespace FluentNHibernate.MappingModel
 {
-    public class VersionMapping : ColumnBasedMappingBase
+    public class VersionMapping : ColumnBasedMappingBase, IMemberMapping
     {
         public VersionMapping()
             : this(new AttributeStore())
@@ -52,6 +52,7 @@ namespace FluentNHibernate.MappingModel
             set { attributes.Set("Generated", value); }
         }
 
+        public Member Member { get; set; }
         public Type ContainingEntityType { get; set; }
 
         public bool Equals(VersionMapping other)

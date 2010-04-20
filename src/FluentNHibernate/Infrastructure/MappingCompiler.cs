@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentNHibernate.Automapping;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.MappingModel;
 using FluentNHibernate.MappingModel.ClassBased;
 using FluentNHibernate.Utils;
@@ -9,22 +11,24 @@ namespace FluentNHibernate.Infrastructure
 {
     public interface IMappingCompiler
     {
-        ITopMapping AutoMap(ITopMapping mapping);
-        ITopMapping ManualMap(ITopMapping mapping);
+        IEnumerable<ITopMapping> Compile(IMappingAction action);
     }
 
     public class MappingCompiler : IMappingCompiler
     {
+        readonly IAutomapper automapper;
         readonly IPersistenceInstructions instructions;
 
-        public MappingCompiler(IPersistenceInstructions instructions)
+        public MappingCompiler(IAutomapper automapper, IPersistenceInstructions instructions)
         {
+            this.automapper = automapper;
             this.instructions = instructions;
         }
 
         public IEnumerable<HibernateMapping> BuildMappings()
         {
-            var mappings = CompileProviders(instructions.Sources);
+            var actions = instructions.GetActions();
+            var mappings = CompileActions(actions);
 
             instructions.Visitors
                 .Each(x => x.Visit(mappings));
@@ -32,27 +36,37 @@ namespace FluentNHibernate.Infrastructure
             return mappings;
         }
 
-        IEnumerable<HibernateMapping> CompileProviders(IEnumerable<IProviderSource> sources)
+        IEnumerable<HibernateMapping> CompileActions(IEnumerable<IMappingAction> actions)
         {
-            var topMappings = sources
-                .SelectMany(x => x.Compile(this).CompiledMappings);
+            var mappings = actions.SelectMany(x => Compile(x));
             var hbm = new HibernateMapping();
 
-            topMappings.Each(x => x.AddTo(hbm));
+            mappings.Each(x => x.AddTo(hbm));
 
             return new[] { hbm };
         }
 
-        public virtual ITopMapping AutoMap(ITopMapping mapping)
+        public virtual IEnumerable<ITopMapping> AutoMap(AutomapAction action)
         {
-            var automapping = instructions.AutomappingInstructions;
+            var mainInstructions = instructions.AutomappingInstructions;
+            var targets = action.GetMappingTargets(mainInstructions);
 
-            return mapping;
+            return automapper.Map(targets);
         }
 
-        public virtual ITopMapping ManualMap(ITopMapping mapping)
+        public virtual IEnumerable<ITopMapping> ManualMap(ManualAction action)
         {
-            return mapping;
+            return new[] { action.GetMapping() };
+        }
+
+        public IEnumerable<ITopMapping> Compile(IMappingAction action)
+        {
+            if (action is ManualAction)
+                return ManualMap((ManualAction)action);
+            if (action is AutomapAction)
+                return AutoMap((AutomapAction)action);
+
+            throw new InvalidOperationException(string.Format("Unrecognised action '{0}'", action.GetType().FullName));
         }
     }
 }

@@ -68,7 +68,7 @@ namespace FluentNHibernate.Automapping
         /// </summary>
         /// <returns>Collection of mapping steps</returns>
         // TODO: Remove need for ConventionFinder and AutoMapper references here
-        IEnumerable<IAutomappingStep> GetMappingSteps(AutoMapper mapper, IConventionFinder conventionFinder);
+        IEnumerable<IAutomappingStep> GetMappingSteps(IAutomapper mapper, IConventionFinder conventionFinder);
 
         void GetConventions(IConventionContainer container);
     }
