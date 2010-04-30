@@ -24,7 +24,7 @@ namespace FluentNHibernate.Specs.FluentInterface.ClassMapSpecs
         };
 
         It should_specify_the_default_generator_for_the_id = () =>
-            Id.Generator.Class.ShouldEqual("identity");
+            Id.Generator.Class.ShouldEqual("increment");
 
         It should_set_the_id_type_to_int_by_default = () =>
             Id.Type.ShouldEqual(new TypeReference(typeof(int)));

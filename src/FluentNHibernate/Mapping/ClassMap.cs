@@ -232,11 +232,12 @@ namespace FluentNHibernate.Mapping
         /// Create an Id that doesn't have a corresponding property in
         /// the domain object, or a column in the database. This is mainly
         /// for use with read-only access and/or views. Defaults to an int
-        /// identity with an "identity" generator.
+        /// identity with an "increment" generator.
         /// </summary>
         public IdentityPart Id()
         {
-            return Id<int>(null);
+            return Id<int>(null)
+                .GeneratedBy.Increment();
         }
 
         /// <summary>
