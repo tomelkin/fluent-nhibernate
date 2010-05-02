@@ -1,0 +1,171 @@
+body {
+	font-family: Helvetica, Arial, Geneva, sans-serif;
+	font-size: 14px;
+	line-height: 1.4em;
+	background: #efeee4;
+	margin: 0;
+}
+
+h1 {
+  margin: 0;
+  padding: 10px 10px 30px 20px;
+  color: #FFF;
+  font-weight: normal;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+h1 .guides {
+  color: #aaa;
+}
+
+h1 a:hover {
+  text-decoration: none;
+}
+
+h2 {
+	font-weight: normal;
+	margin: 0;
+}
+
+a {
+	color: #900;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a img {
+	border: 0;
+}
+
+#see-also {
+  background: #222;
+  margin: 0;
+  padding: 5px 20px 0 20px;
+  color: #999;
+  font-size: 0.8em;
+}
+
+#see-also .bottom {
+  background: #efeee4;
+  height: 20px;
+  margin: 4px -20px 0 -20px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+#see-also a {
+  color: #a4a37a;
+  text-decoration: underline;
+  margin: 0 2px;
+}
+
+#see-also span {
+  color: #bbb;
+}
+
+#see-also span a {
+  color: #FFF;
+  margin: 0;
+  text-decoration: none;
+}
+
+p.copy {
+	text-align: center;
+	font-size: 12px;
+	margin-top: 20px;
+}
+
+#index {
+  float: left;
+  text-align: center;
+  margin: 0 0 0 10px;
+}
+
+#index ul {
+  text-align: left;
+  background: #FFF;
+  border-radius: 5px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  margin: 0 0 10px 0;
+  padding: 10px 10px 10px 10px;
+}
+
+#index li {
+  list-style: none;
+}
+
+#index dl {
+  margin: 0;
+}
+
+#index dt {
+  color: #5e5d42;
+  margin-top: 15px;
+}
+
+#index dd {
+  margin: 0 0 0 10px;
+}
+
+#content {
+  margin: 0 0 0 255px;
+  width: 650px;
+}
+
+#body {
+  background: #FFF;
+  border-radius: 5px;
+  padding: 15px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+p {
+  margin: 0 0 10px 0;
+}
+
+pre {
+  font-family: Monaco, Consolas, monospace;
+  margin: 0 -15px 10px -15px;
+  padding: 5px 15px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  background: #f2f2f2;
+  font-size: 12px;
+  line-height: 1.45em;
+}
+
+pre .line {
+  background: #fafddf;
+  display: block;
+  margin: 0;
+}
+
+blockquote.note, blockquote.warning {
+  font-size: 0.9em;
+  margin: 0 -15px 10px -15px;
+  padding: 10px 15px 10px 62px;
+  background: no-repeat 8px 5px;
+  font-family: Helvetica, Arial, Geneva, sans-serif;
+}
+
+blockquote.note {
+  border-top: 1px solid #dcdba5;
+  border-bottom: 1px solid #dcdba5;
+  background-color: #fafddf;
+  background-image: url(../images/Info.png);
+}
+
+blockquote.warning {
+  border-top: 1px solid #e8d5d3;
+  border-bottom: 1px solid #e8d5d3;
+  background-color: #fee9e7;
+  background-image: url(../images/Warning.png);
+}
+
+blockquote.note .title, blockquote.warning .title {
+  display: block;
+  font-weight: bold;
+}

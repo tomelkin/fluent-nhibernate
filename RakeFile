@@ -1,5 +1,8 @@
+$: << File.join(File.dirname(__FILE__), 'docs/lib')
+
 require 'fileutils'
 require 'albacore'
+require 'guidance'
 
 def get_version
   ENV['BUILD_NUMBER'] || '1.0.0.0'
@@ -96,6 +99,11 @@ namespace :docs do
   docu :build do |d|
     d.path_to_command = 'tools/docu/docu.exe'
     d.assemblies << 'build/FluentNHibernate.dll'
+  end
+
+  desc 'Create guides'
+  task :guides do
+    Guidance::GuideGenerator.run 'docs/pages', 'docs/output'
   end
 end
 
